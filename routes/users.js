@@ -1,11 +1,20 @@
 const express = require('express');
-const router = express.Router();
-const { createUser, getUsers, editUser, deleteUser, getUserById } = require('../database/users.db.js');
-const { getAttendanceLogForAllUsers, getAttendanceLogForUser } = require('../database/attendances.db');
 const multer = require('multer');
-const upload = multer();
+const router = express.Router();
+const upload = require('../uploads/upload'); // Import the upload configuration
+const {     
+  getAttendancesByMeetingScheduleId,
+  getMeetingScheduleWithAttendances,
+} = require('../database/attendances.db');
+const {
+  createUser,
+  getUsers,
+  getUserById,
+  editUser,
+  deleteUser,
+} = require('../database/users.db');
 
-// GET /users
+// GET all users
 router.get('/', async (req, res) => {
   try {
     const users = await getUsers();
@@ -32,10 +41,11 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /users
-router.post('/', upload.none(), async (req, res) => {
+router.post('/', upload.single('profile_pic'), async (req, res) => {
   try {
-    const { username, password, role } = req.body;
-    const newUser = await createUser(username, password, role);
+    const { username, password, role, name, email, phone, address } = req.body;
+    const profile_pic = req.file ? `/uploads/images/${req.file.filename}` : null;
+    const newUser = await createUser(username, password, role, name, email, phone, address, profile_pic);
     res.json(newUser);
   } catch (err) {
     console.error(err);
@@ -44,18 +54,16 @@ router.post('/', upload.none(), async (req, res) => {
 });
 
 // PUT /users/:id
-router.put('/:id', upload.none(), async (req, res) => {
+router.put('/:id', upload.single('profile_pic'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, password, role } = req.body;
-    const editedUser = await editUser(id, username, password, role);
-    if (!editedUser) {
-      return res.status(404).send({ message: 'User not found' });
-    }
+    const { username, password, role, name, email, phone, address } = req.body;
+    const profile_pic = req.file ? `/uploads/images/${req.file.filename}` : null;
+    const editedUser = await editUser(id, username, password, role, name, email, phone, address, profile_pic);
     res.json(editedUser);
   } catch (err) {
     console.error(err);
-    res.status(500).send({ message: `Error editing user: ${err.message}` });
+    res.status(500).send({ message: `Error updating user: ${err.message}` });
   }
 });
 
@@ -63,11 +71,8 @@ router.put('/:id', upload.none(), async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedUser = await deleteUser(id);
-    if (!deletedUser) {
-      return res.status(404).send({ message: 'User not found' });
-    }
-    res.json(deletedUser);
+    const message = await deleteUser(id);
+    res.json({ message });
   } catch (err) {
     console.error(err);
     res.status(500).send({ message: `Error deleting user: ${err.message}` });

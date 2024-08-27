@@ -10,11 +10,6 @@ var usersRouter = require('./routes/users');
 var meetingsRouter = require('./routes/meetings');
 var attendancesRouter = require('./routes/attendances');
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/meetings', meetingsRouter);
-app.use('/attendances', attendancesRouter)
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -24,6 +19,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads/images', express.static(path.join(__dirname, 'uploads/images'))); // Serve static files from uploads/images
+
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+app.use('/meetings', meetingsRouter);
+app.use('/attendances', attendancesRouter)
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
