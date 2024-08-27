@@ -1,5 +1,6 @@
 const express = require('express');
 const { createMeeting, getMeetings, getMeetingById, editMeeting, deleteMeeting } = require('../database/meetings.db.js'); // Import the functions
+const { getAbsenceRequestsByMeetingId, processAbsenceRequest } = require('../database/absenceRequests.db.js'); // Import the functions to handle absence requests
 const multer = require('multer');
 const router = express.Router();
 const upload = multer();
@@ -75,5 +76,31 @@ router.delete('/:id', async (req, res) => {
         res.status(500).send({ message: `Error deleting meeting: ${err.message}` });
     }
 });
+
+// Get absence requests for a specific meeting
+router.get('/:id/absence-requests', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const absenceRequests = await getAbsenceRequestsByMeetingId(id);
+        res.json(absenceRequests);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: `Error retrieving absence requests: ${err.message}` });
+    }
+});
+
+// Process an absence request
+router.post('/:meetingId/absence-requests/:id', upload.none(), async (req, res) => {
+    try {
+        const { meetingId, id } = req.params;
+        const { state } = req.body;
+        const processedRequest = await processAbsenceRequest(id, state);
+        res.json(processedRequest);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: `Error processing absence request: ${err.message}` });
+    }
+});
+
 
 module.exports = router;
