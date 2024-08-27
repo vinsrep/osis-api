@@ -1,7 +1,6 @@
 const express = require('express');
-const { getMeetings, createMeeting, getMeetingById, updateMeeting, deleteMeeting } = require('./meetings.js'); // Import the functions
+const { createMeeting, getMeetings, getMeetingById, editMeeting, deleteMeeting } = require('../database/meetings.db.js'); // Import the functions
 const multer = require('multer');
-
 const router = express.Router();
 const upload = multer();
 
@@ -19,8 +18,8 @@ router.get('/', async (req, res) => {
 // Create a new meeting
 router.post('/', upload.none(), async (req, res) => {
     try {
-        const { title, date, time, location } = req.body;
-        const newMeeting = await createMeeting(title, date, time, location);
+        const { title, description, start_date, end_date, start_time, end_time } = req.body;
+        const newMeeting = await createMeeting(title, description, start_date, end_date, start_time, end_time);
         res.status(201).json(newMeeting);
     } catch (err) {
         console.error(err);
@@ -44,20 +43,20 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Update a meeting
+// Edit a meeting
 router.put('/:id', upload.none(), async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, date, time, location } = req.body;
-        const updatedMeeting = await updateMeeting(id, title, date, time, location);
-        if (!updatedMeeting) {
+        const { title, description, start_date, end_date, start_time, end_time } = req.body;
+        const editedMeeting = await editMeeting(id, title, description, start_date, end_date, start_time, end_time);
+        if (!editedMeeting) {
             res.status(404).send({ message: 'Meeting not found' });
         } else {
-            res.json(updatedMeeting);
+            res.json(editedMeeting);
         }
     } catch (err) {
         console.error(err);
-        res.status(500).send({ message: `Error updating meeting: ${err.message}` });
+        res.status(500).send({ message: `Error editing meeting: ${err.message}` });
     }
 });
 
@@ -76,3 +75,5 @@ router.delete('/:id', async (req, res) => {
         res.status(500).send({ message: `Error deleting meeting: ${err.message}` });
     }
 });
+
+module.exports = router;
