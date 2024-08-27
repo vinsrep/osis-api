@@ -8,10 +8,12 @@ var app = express();
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var meetingsRouter = require('./routes/meetings');
+var attendancesRouter = require('./routes/attendances');
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/meetings', meetingsRouter);
+app.use('/attendances', attendancesRouter)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

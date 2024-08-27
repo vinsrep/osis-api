@@ -18,8 +18,8 @@ router.get('/', async (req, res) => {
 // Create a new meeting
 router.post('/', upload.none(), async (req, res) => {
     try {
-        const { title, description, start_date, end_date, start_time, end_time } = req.body;
-        const newMeeting = await createMeeting(title, description, start_date, end_date, start_time, end_time);
+        const { title, description, date, start_time, end_time } = req.body;
+        const newMeeting = await createMeeting(title, description, date, start_time, end_time);
         res.status(201).json(newMeeting);
     } catch (err) {
         console.error(err);
@@ -47,8 +47,8 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', upload.none(), async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, start_date, end_date, start_time, end_time } = req.body;
-        const editedMeeting = await editMeeting(id, title, description, start_date, end_date, start_time, end_time);
+        const { title, description, date, start_time, end_time } = req.body;
+        const editedMeeting = await editMeeting(id, title, description, date, start_time, end_time);
         if (!editedMeeting) {
             res.status(404).send({ message: 'Meeting not found' });
         } else {

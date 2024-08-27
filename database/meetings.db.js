@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const { getAttendancesByMeetingScheduleId } = require('./attendances.db.js');
 
 const pool = new Pool({
   user: 'postgres',
@@ -14,7 +15,15 @@ async function getMeetings() {
   };
   try {
     const result = await pool.query(query);
-    return result.rows;
+    const meetings = result.rows;
+
+    // Fetch attendances for each meeting schedule
+    for (const meeting of meetings) {
+      const attendances = await getAttendancesByMeetingScheduleId(meeting.id);
+      meeting.attendances = attendances;
+    }
+
+    return meetings;
   } catch (err) {
     console.error(err);
     throw err;
@@ -22,22 +31,30 @@ async function getMeetings() {
 }
 
 async function getMeetingById(id) {
-    if (!id) {
-        throw new Error('ID is required');
+  if (!id) {
+    throw new Error('ID is required');
+  }
+
+  const query = {
+    text: `SELECT * FROM meeting_schedules WHERE id = $1`,
+    values: [id],
+  };
+  try {
+    const result = await pool.query(query);
+    const meeting = result.rows[0];
+
+    if (meeting) {
+      const attendances = await getAttendancesByMeetingScheduleId(meeting.id);
+      meeting.attendances = attendances;
     }
 
-    const query = {
-        text: `SELECT * FROM meeting_schedules WHERE id = $1`,
-        values: [id],
-    };
-    try {
-        const result = await pool.query(query);
-        return result.rows[0];
-    } catch (err) {
-        console.error(err);
-        throw err;
-    }
+    return meeting;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 }
+
 
 async function createMeeting(title, description, date, start_time, end_time) {
     if (!title || !description || !date || !start_time || !end_time) {
@@ -91,21 +108,31 @@ async function editMeeting(id, title, description, date, start_time, end_time) {
 
 async function deleteMeeting(id) {
     if (!id) {
-        throw new Error('ID is required');
+      throw new Error('ID is required');
     }
 
-    const query = {
-        text: `DELETE FROM meeting_schedules WHERE id = $1`,
-        values: [id],
+    const deleteAttendancesQuery = {
+      text: `DELETE FROM attendances WHERE meeting_schedule_id = $1`,
+      values: [id],
     };
+
+    const deleteMeetingQuery = {
+      text: `DELETE FROM meeting_schedules WHERE id = $1`,
+      values: [id],
+    };
+
     try {
-        await pool.query(query);
-        return "Meeting has been deleted.";
+      await pool.query('BEGIN');
+      await pool.query(deleteAttendancesQuery);
+      await pool.query(deleteMeetingQuery);
+      await pool.query('COMMIT');
+      return { message: 'Meeting and related attendances deleted successfully' };
     } catch (err) {
-        console.error(err);
-        throw err;
+      await pool.query('ROLLBACK');
+      console.error(err);
+      throw err;
     }
-}
+  }
 
 
 module.exports = { createMeeting, getMeetings, getMeetingById, editMeeting, deleteMeeting };
