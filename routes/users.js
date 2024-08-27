@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { createUser, getUsers, editUser, deleteUser, getUserById } = require('../database/users.db.js');
+const { getAttendanceLogForAllUsers, getAttendanceLogForUser } = require('../database/attendances.db');
 const multer = require('multer');
 const upload = multer();
 
@@ -70,6 +71,29 @@ router.delete('/:id', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send({ message: `Error deleting user: ${err.message}` });
+  }
+});
+
+// route to get attendance log for every user
+router.get('/attendance-log', async (req, res) => {
+  try {
+    const attendanceLog = await getAttendanceLogForAllUsers();
+    res.json(attendanceLog);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: `Error fetching attendance log: ${err.message}` });
+  }
+});
+
+// route to get attendance log for a specific user
+router.get('/:id/attendance-log', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const attendanceLog = await getAttendanceLogForUser(id);
+    res.json(attendanceLog);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: `Error fetching attendance log: ${err.message}` });
   }
 });
 

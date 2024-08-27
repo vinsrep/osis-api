@@ -103,6 +103,67 @@ async function createAttendance(userId, meetingScheduleId, status, note) {
     return { message: 'Attendance record deleted successfully' };
   }
   
+async function getAttendanceLogForAllUsers() {
+const query = {
+    text: `
+    SELECT 
+        users.id AS user_id, 
+        users.name AS user_name, 
+        attendances.meeting_schedule_id, 
+        attendances.attendance_status, 
+        meeting_schedules.title AS meeting_title, 
+        meeting_schedules.date AS meeting_date
+    FROM 
+        attendances
+    JOIN 
+        users ON attendances.user_id = users.id
+    JOIN 
+        meeting_schedules ON attendances.meeting_schedule_id = meeting_schedules.id
+    ORDER BY 
+        users.id, meeting_schedules.date
+    `,
+};
+try {
+    const result = await pool.query(query);
+    return result.rows;
+} catch (err) {
+    console.error(err);
+    throw err;
+}
+}
+
+async function getAttendanceLogForUser(userId) {
+    const query = {
+      text: `
+        SELECT 
+          users.id AS user_id, 
+          users.username AS user_name, 
+          attendances.meeting_schedule_id, 
+          attendances.status, 
+          meeting_schedules.title AS meeting_title, 
+          meeting_schedules.date AS meeting_date
+        FROM 
+          attendances
+        JOIN 
+          users ON attendances.user_id = users.id
+        JOIN 
+          meeting_schedules ON attendances.meeting_schedule_id = meeting_schedules.id
+        WHERE 
+          users.id = $1
+        ORDER BY 
+          meeting_schedules.date
+      `,
+      values: [userId],
+    };
+    try {
+      const result = await pool.query(query);
+      return result.rows;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
   module.exports = {
     getAttendancesByMeetingScheduleId,
     getMeetingScheduleWithAttendances,
@@ -111,4 +172,6 @@ async function createAttendance(userId, meetingScheduleId, status, note) {
     getAttendanceById,
     editAttendanceById,
     deleteAttendanceById,
+    getAttendanceLogForAllUsers,
+    getAttendanceLogForUser,
   };
