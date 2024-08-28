@@ -1,4 +1,4 @@
-<a id="readme-top"></a>
+![image](https://github.com/user-attachments/assets/ae75fec0-de08-40c8-a32e-0684992f6e2f)<a id="readme-top"></a>
 
 
 <!-- PROJECT SHIELDS -->
@@ -20,15 +20,13 @@
 <br />
 <div align="center">
   <a href="https://github.com/vinsrep/osis-api">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Logo_OSIS.svg/1200px-Logo_OSIS.svg.png" alt="Logo" width="80" height="80">
+    <img src="https://github.com/user-attachments/assets/99984be4-26d4-48cc-b514-26ad2359485b" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">OSIS Attendance Manager API</h3>
 
   <p align="center">
-    An awesome README template to jumpstart your projects!
-    <br />
-    <a href="https://github.com/vinsrep/osis-api"><strong>Explore the docs »</strong></a>
+    Backend API of OSIS Attendance Manager (2024).
     <br />
     <br />
     <a href="https://github.com/vinsrep/osis-api/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
