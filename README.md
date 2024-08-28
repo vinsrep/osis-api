@@ -15,15 +15,32 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 
-# osis-api
-Backend API of OSIS Internal Web (2024) using ExpressJS
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/vinsrep/osis-api">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Logo_OSIS.svg/1200px-Logo_OSIS.svg.png" alt="Logo" width="80" height="80">
+  </a>
+
+  <h3 align="center">OSIS Attendance Manager API</h3>
+
+  <p align="center">
+    An awesome README template to jumpstart your projects!
+    <br />
+    <a href="https://github.com/vinsrep/osis-api"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/vinsrep/osis-api/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    ·
+    <a href="https://github.com/vinsrep/osis-api/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+  </p>
+</div>
 
 ### Built With
 
 * [![Express][Express.js]][Express-url]
 * [![React][React.js]][React-url] (Front-end)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 # Installation guide
 To setup the API on your device, follow the guide below:
@@ -60,3 +77,5 @@ npm start server
 [Express-url]: https://expressjs.org/
 [React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
 [React-url]: https://reactjs.org/
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
