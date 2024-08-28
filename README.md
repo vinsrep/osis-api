@@ -1,7 +1,11 @@
+<a id="readme-top"></a>
+
+[![Contributors][contributors-shield]][https://github.com/vinsrep/osis-api/graphs/contributors]
+[![Forks][forks-shield]][https://github.com/vinsrep/osis-api/forks]
+[![MIT License][license-shield]][https://github.com/vinsrep/osis-api/blob/main/LICENSE]
+
 # osis-api
 Backend API of OSIS Internal Web (2024) using ExpressJS
-
-![express](https://media.licdn.com/dms/image/D5612AQGDoyo0FeCniw/article-cover_image-shrink_720_1280/0/1691585795722?e=2147483647&v=beta&t=rd1TLamS7FFyUnHToGWRB4nS1mEOw7dZ_SrRHihCBdo)
 
 # Installation guide
 To setup the API on your device, follow the guide below:
