@@ -1,4 +1,5 @@
-![image](https://github.com/user-attachments/assets/ae75fec0-de08-40c8-a32e-0684992f6e2f)<a id="readme-top"></a>
+<!--![image](https://github.com/user-attachments/assets/ae75fec0-de08-40c8-a32e-0684992f6e2f)-->
+<a id="readme-top"></a>
 
 
 <!-- PROJECT SHIELDS -->
@@ -20,7 +21,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/vinsrep/osis-api">
-    <img src="https://github.com/user-attachments/assets/99984be4-26d4-48cc-b514-26ad2359485b" alt="Logo" width="80" height="80">
+    <img src="https://github.com/user-attachments/assets/99984be4-26d4-48cc-b514-26ad2359485b" alt="Logo" width="100" height="100" style="border-radius: 50%">
   </a>
 
   <h3 align="center">OSIS Attendance Manager API</h3>
