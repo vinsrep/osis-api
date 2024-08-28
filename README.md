@@ -14,7 +14,6 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
 
 # osis-api
 Backend API of OSIS Internal Web (2024) using ExpressJS
@@ -46,15 +45,15 @@ npm start server
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/othneildrew/osis-api.svg?style=for-the-badge
-[contributors-url]: https://github.com/othneildrew/osis-api/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/othneildrew/osis-api.svg?style=for-the-badge
-[forks-url]: https://github.com/othneildrew/osis-api/network/members
-[stars-shield]: https://img.shields.io/github/stars/othneildrew/osis-api.svg?style=for-the-badge
-[stars-url]: https://github.com/othneildrew/osis-api/stargazers
-[issues-shield]: https://img.shields.io/github/issues/othneildrew/osis-api.svg?style=for-the-badge
-[issues-url]: https://github.com/othneildrew/osis-api/issues
-[license-shield]: https://img.shields.io/github/license/othneildrew/osis-api.svg?style=for-the-badge
-[license-url]: https://github.com/othneildrew/osis-api/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/vinsrep/osis-api.svg?style=for-the-badge
+[contributors-url]: https://github.com/vinsrep/osis-api/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/vinsrep/osis-api.svg?style=for-the-badge
+[forks-url]: https://github.com/vinsrep/osis-api/network/members
+[stars-shield]: https://img.shields.io/github/stars/vinsrep/osis-api.svg?style=for-the-badge
+[stars-url]: https://github.com/vinsrep/osis-api/stargazers
+[issues-shield]: https://img.shields.io/github/issues/vinsrep/osis-api.svg?style=for-the-badge
+[issues-url]: https://github.com/vinsrep/osis-api/issues
+[license-shield]: https://img.shields.io/github/license/vinsrep/osis-api.svg?style=for-the-badge
+[license-url]: https://github.com/vinsrep/osis-api/blob/main/LICENSE.txt
 [Express.js]: https://img.shields.io/badge/Express%20js-000000?style=for-the-badge&logo=express&logoColor=white
 [Express-url]: https://expressjs.org/
