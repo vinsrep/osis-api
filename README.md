@@ -21,6 +21,7 @@ Backend API of OSIS Internal Web (2024) using ExpressJS
 ### Built With
 
 * [![Express][Express.js]][Express-url]
+* [![React][React.js]][React-url] (Front-end)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -57,3 +58,5 @@ npm start server
 [license-url]: https://github.com/vinsrep/osis-api/blob/main/LICENSE.txt
 [Express.js]: https://img.shields.io/badge/Express%20js-000000?style=for-the-badge&logo=express&logoColor=white
 [Express-url]: https://expressjs.org/
+[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[React-url]: https://reactjs.org/
