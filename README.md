@@ -21,7 +21,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/vinsrep/osis-api">
-    <img src="https://github.com/user-attachments/assets/99984be4-26d4-48cc-b514-26ad2359485b" alt="Logo" width="100" height="100" style="border-radius: 50%">
+    <img class="pfp" src="https://github.com/user-attachments/assets/99984be4-26d4-48cc-b514-26ad2359485b" alt="Logo" width="100" height="100">
   </a>
 
   <h3 align="center">OSIS Attendance Manager API</h3>
