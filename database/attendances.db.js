@@ -49,92 +49,111 @@ getMeetingScheduleWithAttendances(1)
 
 // Function to get all attendances
 async function getAttendances() {
-    const query = `
+  const query = `
         SELECT * FROM attendances
     `;
-    const res = await pool.query(query);
-    return res.rows;
+  const res = await pool.query(query);
+  return res.rows;
 }
 
 // Function to create a new attendance record
 async function createAttendance(userId, meetingScheduleId, status, note) {
-    const query = `
+  const query = `
       INSERT INTO attendances (user_id, meeting_schedule_id, status, note)
       VALUES ($1, $2, $3, $4)
       RETURNING *
     `;
-    const values = [userId, meetingScheduleId, status, note];
-    const res = await pool.query(query, values);
-    return res.rows[0];
-  }
-  
-  // Function to get an attendance record by ID
-  async function getAttendanceById(attendanceId) {
-    const query = `
+  const values = [userId, meetingScheduleId, status, note];
+  const res = await pool.query(query, values);
+  return res.rows[0];
+}
+
+// Function to get an attendance record by ID
+async function getAttendanceById(attendanceId) {
+  const query = `
       SELECT * FROM attendances
       WHERE id = $1
     `;
-    const values = [attendanceId];
-    const res = await pool.query(query, values);
-    return res.rows[0];
-  }
-  
-  // Function to update an attendance record by ID
-  async function editAttendanceById(attendanceId, status, note) {
-    const query = `
+  const values = [attendanceId];
+  const res = await pool.query(query, values);
+  return res.rows[0];
+}
+
+// Function to update an attendance record by ID
+async function editAttendanceById(attendanceId, status, note) {
+  const query = `
       UPDATE attendances
       SET status = $2, note = $3, updated_at = CURRENT_TIMESTAMP
       WHERE id = $1
       RETURNING *
     `;
-    const values = [attendanceId, status, note];
-    const res = await pool.query(query, values);
-    return res.rows[0];
-  }
-  
-  // Function to delete an attendance record by ID
-  async function deleteAttendanceById(attendanceId) {
-    const query = `
+  const values = [attendanceId, status, note];
+  const res = await pool.query(query, values);
+  return res.rows[0];
+}
+
+// Function to delete an attendance record by ID
+async function deleteAttendanceById(attendanceId) {
+  const query = `
       DELETE FROM attendances
       WHERE id = $1
     `;
-    const values = [attendanceId];
-    await pool.query(query, values);
-    return { message: 'Attendance record deleted successfully' };
-  }
-  
-async function getAttendanceLogForAllUsers() {
-const query = {
-    text: `
-    SELECT 
-        users.id AS user_id, 
-        users.name AS user_name, 
-        attendances.meeting_schedule_id, 
-        attendances.attendance_status, 
-        meeting_schedules.title AS meeting_title, 
-        meeting_schedules.date AS meeting_date
-    FROM 
-        attendances
-    JOIN 
-        users ON attendances.user_id = users.id
-    JOIN 
-        meeting_schedules ON attendances.meeting_schedule_id = meeting_schedules.id
-    ORDER BY 
-        users.id, meeting_schedules.date
-    `,
-};
-try {
-    const result = await pool.query(query);
-    return result.rows;
-} catch (err) {
-    console.error(err);
-    throw err;
-}
+  const values = [attendanceId];
+  await pool.query(query, values);
+  return { message: 'Attendance record deleted successfully' };
 }
 
+async function getAttendanceLogForAllUsers() {
+  const query = {
+    text: `
+        SELECT 
+          users.id AS user_id, 
+          users.username AS user_name, 
+          attendances.meeting_schedule_id, 
+          attendances.status, 
+          meeting_schedules.title AS meeting_title, 
+          meeting_schedules.date AS meeting_date
+        FROM 
+          attendances
+        JOIN 
+          users ON attendances.user_id = users.id
+        JOIN 
+          meeting_schedules ON attendances.meeting_schedule_id = meeting_schedules.id
+        ORDER BY 
+          users.id, meeting_schedules.date
+      `,
+  };
+  try {
+    const result = await pool.query(query);
+    const attendanceLog = result.rows.reduce((acc, row) => {
+      const { user_id, user_name, meeting_schedule_id, status, meeting_title, meeting_date } = row;
+      if (!acc[user_id]) {
+        acc[user_id] = {
+          user_id,
+          user_name,
+          attendances: []
+        };
+      }
+      acc[user_id].attendances.push({
+        meeting_schedule_id,
+        status,
+        meeting_title,
+        meeting_date
+      });
+      return acc;
+    }, {});
+
+    return Object.values(attendanceLog);
+  } catch (err) {
+    console.error('Error retrieving attendance log:', err);
+    throw new Error('Error retrieving attendance log');
+  }
+}
+
+
 async function getAttendanceLogForUser(userId) {
-    const query = {
-      text: `
+  const query = {
+    text: `
         SELECT 
           users.id AS user_id, 
           users.username AS user_name, 
@@ -153,25 +172,25 @@ async function getAttendanceLogForUser(userId) {
         ORDER BY 
           meeting_schedules.date
       `,
-      values: [userId],
-    };
-    try {
-      const result = await pool.query(query);
-      return result.rows;
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
-  }
-
-  module.exports = {
-    getAttendancesByMeetingScheduleId,
-    getMeetingScheduleWithAttendances,
-    getAttendances, 
-    createAttendance,
-    getAttendanceById,
-    editAttendanceById,
-    deleteAttendanceById,
-    getAttendanceLogForAllUsers,
-    getAttendanceLogForUser,
+    values: [userId],
   };
+  try {
+    const result = await pool.query(query);
+    return result.rows;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+module.exports = {
+  getAttendancesByMeetingScheduleId,
+  getMeetingScheduleWithAttendances,
+  getAttendances,
+  createAttendance,
+  getAttendanceById,
+  editAttendanceById,
+  deleteAttendanceById,
+  getAttendanceLogForAllUsers,
+  getAttendanceLogForUser,
+};

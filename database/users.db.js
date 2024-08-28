@@ -1,21 +1,39 @@
-const { Pool } = require('pg');
+const { Pool } = require("pg");
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'db_osis',
-  password: '',
+  user: "postgres",
+  host: "localhost",
+  database: "db_osis",
+  password: "",
   port: 5432,
 });
 
-async function createUser(username, password, role, name, email, phone, address, profile_pic) {
+async function createUser(
+  username,
+  password,
+  role,
+  name,
+  email,
+  phone,
+  address,
+  profile_pic
+) {
   if (!username || !password || !role) {
-    throw new Error('Username, password, and role are required');
+    throw new Error("Username, password, and role are required");
   }
 
   const query = {
     text: `INSERT INTO users (username, password, role, name, email, phone, address, profile_pic) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-    values: [username, password, role, name || null, email || null, phone || null, address || null, profile_pic || null],
+    values: [
+      username,
+      password,
+      role,
+      name || null,
+      email || null,
+      phone || null,
+      address || null,
+      profile_pic || null,
+    ],
   };
   try {
     const result = await pool.query(query);
@@ -41,7 +59,7 @@ async function getUsers() {
 
 async function getUserById(id) {
   if (!id) {
-    throw new Error('ID is required');
+    throw new Error("ID is required");
   }
 
   const query = {
@@ -57,14 +75,36 @@ async function getUserById(id) {
   }
 }
 
-async function editUser(id, username, password, role, name, email, phone, address, profile_pic) {
-  if (!id || (!username && !password && !role && !name && !email && !phone && !address && !profile_pic)) {
-    throw new Error('ID is required and at least one of username, password, role, name, email, phone, address, or profile_pic must be provided');
+async function editUser(
+  id,
+  username,
+  password,
+  role,
+  name,
+  email,
+  phone,
+  address,
+  profile_pic
+) {
+  if (
+    !id ||
+    (!username &&
+      !password &&
+      !role &&
+      !name &&
+      !email &&
+      !phone &&
+      !address &&
+      !profile_pic)
+  ) {
+    throw new Error(
+      "ID is required and at least one of username, password, role, name, email, phone, address, or profile_pic must be provided"
+    );
   }
 
   const existingUser = await getUserById(id);
   if (!existingUser) {
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 
   const updatedUser = {
@@ -80,7 +120,17 @@ async function editUser(id, username, password, role, name, email, phone, addres
 
   const query = {
     text: `UPDATE users SET username = $1, password = $2, role = $3, name = $4, email = $5, phone = $6, address = $7, profile_pic = $8, updated_at = CURRENT_TIMESTAMP WHERE id = $9 RETURNING *`,
-    values: [updatedUser.username, updatedUser.password, updatedUser.role, updatedUser.name, updatedUser.email, updatedUser.phone, updatedUser.address, updatedUser.profile_pic, id],
+    values: [
+      updatedUser.username,
+      updatedUser.password,
+      updatedUser.role,
+      updatedUser.name,
+      updatedUser.email,
+      updatedUser.phone,
+      updatedUser.address,
+      updatedUser.profile_pic,
+      id,
+    ],
   };
   try {
     const result = await pool.query(query);
@@ -93,7 +143,7 @@ async function editUser(id, username, password, role, name, email, phone, addres
 
 async function deleteUser(id) {
   if (!id) {
-    throw new Error('ID is required');
+    throw new Error("ID is required");
   }
 
   const query = {

@@ -1,10 +1,9 @@
 const express = require('express');
-const multer = require('multer');
 const router = express.Router();
 const upload = require('../uploads/upload'); // Import the upload configuration
-const {     
-  getAttendancesByMeetingScheduleId,
-  getMeetingScheduleWithAttendances,
+const {
+  getAttendanceLogForAllUsers,
+  getAttendanceLogForUser,
 } = require('../database/attendances.db');
 const {
   createUser,
@@ -13,6 +12,30 @@ const {
   editUser,
   deleteUser,
 } = require('../database/users.db');
+
+// route to get attendance log for every user
+router.get('/attendance-log', async (req, res) => {
+  try {
+    const attendanceLog = await getAttendanceLogForAllUsers();
+    res.json(attendanceLog);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: `Error fetching attendance log: ${err.message}` });
+  }
+});
+
+// route to get attendance log for a specific user
+router.get('/:id/attendance-log', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const attendanceLog = await getAttendanceLogForUser(id);
+    res.json(attendanceLog);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: `Error fetching attendance log: ${err.message}` });
+  }
+});
+
 
 // GET all users
 router.get('/', async (req, res) => {
@@ -60,7 +83,7 @@ router.put('/:id', upload.single('profile_pic'), async (req, res) => {
     const { username, password, role, name, email, phone, address } = req.body;
     const profile_pic = req.file ? `/uploads/images/${req.file.filename}` : null;
     const editedUser = await editUser(id, username, password, role, name, email, phone, address, profile_pic);
-    res.json(editedUser);
+    res.status(201).json(editedUser);
   } catch (err) {
     console.error(err);
     res.status(500).send({ message: `Error updating user: ${err.message}` });
@@ -76,29 +99,6 @@ router.delete('/:id', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send({ message: `Error deleting user: ${err.message}` });
-  }
-});
-
-// route to get attendance log for every user
-router.get('/attendance-log', async (req, res) => {
-  try {
-    const attendanceLog = await getAttendanceLogForAllUsers();
-    res.json(attendanceLog);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({ message: `Error fetching attendance log: ${err.message}` });
-  }
-});
-
-// route to get attendance log for a specific user
-router.get('/:id/attendance-log', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const attendanceLog = await getAttendanceLogForUser(id);
-    res.json(attendanceLog);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({ message: `Error fetching attendance log: ${err.message}` });
   }
 });
 

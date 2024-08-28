@@ -1,56 +1,66 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const multer = require('multer');
+const multer = require("multer");
 const upload = multer().none();
 const {
     getAbsenceRequests,
     getAbsenceRequestById,
     createAbsenceRequest,
     updateAbsenceRequest,
-} = require('../database/absenceRequests.db');
+} = require("../database/absenceRequests.db");
 
 // GET /absence-requests
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
     try {
         const absenceRequests = await getAbsenceRequests();
         res.json(absenceRequests);
     } catch (err) {
         console.error(err);
-        res.status(500).send({ message: `Error retrieving absence requests: ${err.message}` });
+        res
+            .status(500)
+            .send({ message: `Error retrieving absence requests: ${err.message}` });
     }
 });
 
 // GET /absence-requests/:id
-router.get('/:id', async (req, res) => {
+router.get("/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const absenceRequest = await getAbsenceRequestById(id);
         if (!absenceRequest) {
-            res.status(404).send({ message: 'Absence request not found' });
+            res.status(404).send({ message: "Absence request not found" });
         } else {
             res.json(absenceRequest);
         }
     } catch (err) {
         console.error(err);
-        res.status(500).send({ message: `Error retrieving absence request: ${err.message}` });
+        res
+            .status(500)
+            .send({ message: `Error retrieving absence request: ${err.message}` });
     }
 });
 
 // POST /absence-requests
-router.post('/', upload, async (req, res) => {
+router.post("/", upload, async (req, res) => {
     try {
         const { user_id, meeting_schedule_id, reason } = req.body;
-        const newRequest = await createAbsenceRequest(user_id, meeting_schedule_id, reason);
+        const newRequest = await createAbsenceRequest(
+            user_id,
+            meeting_schedule_id,
+            reason
+        );
         res.json(newRequest);
     } catch (err) {
         console.error(err);
-        res.status(500).send({ message: `Error creating absence request: ${err.message}` });
+        res
+            .status(500)
+            .send({ message: `Error creating absence request: ${err.message}` });
     }
 });
 
 // PUT /absence-requests/:id
-router.put('/:id', upload, async (req, res) => {
+router.put("/:id", upload, async (req, res) => {
     try {
         const { id } = req.params;
         const { reason } = req.body;
@@ -58,7 +68,9 @@ router.put('/:id', upload, async (req, res) => {
         res.json(updatedRequest);
     } catch (err) {
         console.error(err);
-        res.status(500).send({ message: `Error updating absence request: ${err.message}` });
+        res
+            .status(500)
+            .send({ message: `Error updating absence request: ${err.message}` });
     }
 });
 
