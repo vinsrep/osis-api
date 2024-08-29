@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { createAttendance, getAttendances, getAttendanceById, editAttendance, deleteAttendance } = require('../database/attendances.db.js');
 const upload = multer();
+const { createAttendance, getAttendances, getAttendanceById, editAttendance, deleteAttendance } = require('../database/attendances.db.js');
+const authenticate = require('../middleware/authenticate');
+const { authorizeAdmin, authorizePengurus, authorizeSiswa } = require('../middleware/authorize');
 
 // Attendance Schedules
-router.get('/', async (req, res) => {
+router.get('/', authenticate, authorizeAdmin, authorizePengurus, async (req, res) => {
     try {
         const attendances = await getAttendances();
         res.json(attendances);
@@ -16,7 +18,7 @@ router.get('/', async (req, res) => {
 });
 
 // Create a new attendance
-router.post('/', upload.none(), async (req, res) => {
+router.post('/', authenticate, authorizeAdmin, upload.none(), async (req, res) => {
     try {
         const { user_id, meeting_schedule_id, status, note } = req.body;
         const newAttendance = await createAttendance(user_id, meeting_schedule_id, status, note);
@@ -28,7 +30,7 @@ router.post('/', upload.none(), async (req, res) => {
 });
 
 // Get a single attendance
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticate, authorizeAdmin, authorizePengurus, async (req, res) => {
     try {
         const { id } = req.params;
         const attendance = await getAttendanceById(id);
@@ -44,7 +46,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Edit an attendance
-router.put('/:id', upload.none(), async (req, res) => {
+router.put('/:id', authenticate, authorizeAdmin, upload.none(), async (req, res) => {
     try {
         const { id } = req.params;
         const { user_id, meeting_schedule_id, status, note } = req.body;
@@ -61,7 +63,7 @@ router.put('/:id', upload.none(), async (req, res) => {
 });
 
 // Delete an attendance
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, authorizeAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const deletedAttendance = await deleteAttendance(id);

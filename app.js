@@ -1,3 +1,4 @@
+require('dotenv').config();
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -11,6 +12,7 @@ var meetingsRouter = require('./routes/meetings');
 var attendancesRouter = require('./routes/attendances');
 var absenceRequestsRouter = require('./routes/absenceRequests');
 var votingRouter = require('./routes/voting');
+var loginRouter = require('./routes/login');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -29,6 +31,7 @@ app.use('/meetings', meetingsRouter);
 app.use('/attendances', attendancesRouter);
 app.use('/absence-requests', absenceRequestsRouter);
 app.use('/voting', votingRouter);
+app.use('/login', loginRouter);
 
 
 // catch 404 and forward to error handler

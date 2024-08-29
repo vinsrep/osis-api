@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-
+const authenticate = require('../middleware/authenticate');
+const { authorizeAdmin, authorizePengurus, authorizeSiswa } = require('../middleware/authorize');
 const multer = require("multer");
 const upload = multer().none();
 const {
@@ -11,7 +12,7 @@ const {
 } = require("../database/absenceRequests.db");
 
 // GET /absence-requests
-router.get("/", async (req, res) => {
+router.get("/", authenticate, authorizeAdmin, authorizePengurus, async (req, res) => {
     try {
         const absenceRequests = await getAbsenceRequests();
         res.json(absenceRequests);
@@ -24,7 +25,7 @@ router.get("/", async (req, res) => {
 });
 
 // GET /absence-requests/:id
-router.get("/:id", async (req, res) => {
+router.get("/:id", authenticate, authorizeAdmin, authorizePengurus, async (req, res) => {
     try {
         const { id } = req.params;
         const absenceRequest = await getAbsenceRequestById(id);
@@ -42,7 +43,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // POST /absence-requests
-router.post("/", upload, async (req, res) => {
+router.post("/", authenticate, authorizeAdmin, authorizePengurus, upload, async (req, res) => {
     try {
         const { user_id, meeting_schedule_id, reason } = req.body;
         const newRequest = await createAbsenceRequest(
@@ -60,7 +61,7 @@ router.post("/", upload, async (req, res) => {
 });
 
 // PUT /absence-requests/:id
-router.put("/:id", upload, async (req, res) => {
+router.put("/:id", authenticate, authorizeAdmin, authorizePengurus, upload, async (req, res) => {
     try {
         const { id } = req.params;
         const { reason } = req.body;

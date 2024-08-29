@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const upload = require('../uploads/upload'); // Import the upload configuration
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+const authenticate = require('../middleware/authenticate');
+const { authorizeAdmin, authorizePengurus, authorizeSiswa } = require('../middleware/authorize');
 const {
   getAttendanceLogForAllUsers,
   getAttendanceLogForUser,
@@ -14,7 +18,7 @@ const {
 } = require('../database/users.db');
 
 // route to get attendance log for every user
-router.get('/attendance-log', async (req, res) => {
+router.get('/attendance-log', authenticate, authorizeAdmin, async (req, res) => {
   try {
     const attendanceLog = await getAttendanceLogForAllUsers();
     res.json(attendanceLog);
@@ -25,7 +29,7 @@ router.get('/attendance-log', async (req, res) => {
 });
 
 // route to get attendance log for a specific user
-router.get('/:id/attendance-log', async (req, res) => {
+router.get('/:id/attendance-log', authenticate, authorizeAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const attendanceLog = await getAttendanceLogForUser(id);
@@ -38,7 +42,7 @@ router.get('/:id/attendance-log', async (req, res) => {
 
 
 // GET all users
-router.get('/', async (req, res) => {
+router.get('/',  async (req, res) => {
   try {
     const users = await getUsers();
     res.json(users);
@@ -64,11 +68,15 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /users
-router.post('/', upload.single('profile_pic'), async (req, res) => {
+router.post('/', authenticate, authorizeAdmin, upload.single('profile_pic'),  async (req, res) => {
   try {
     const { username, password, role, name, email, phone, address } = req.body;
     const profile_pic = req.file ? `/uploads/images/${req.file.filename}` : null;
-    const newUser = await createUser(username, password, role, name, email, phone, address, profile_pic);
+    
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    
+    const newUser = await createUser(username, hashedPassword, role, name, email, phone, address, profile_pic);
     res.json(newUser);
   } catch (err) {
     console.error(err);
@@ -77,13 +85,20 @@ router.post('/', upload.single('profile_pic'), async (req, res) => {
 });
 
 // PUT /users/:id
-router.put('/:id', upload.single('profile_pic'), async (req, res) => {
+router.put('/:id', authenticate, authorizeAdmin, upload.single('profile_pic'), async (req, res) => {
   try {
     const { id } = req.params;
     const { username, password, role, name, email, phone, address } = req.body;
     const profile_pic = req.file ? `/uploads/images/${req.file.filename}` : null;
-    const editedUser = await editUser(id, username, password, role, name, email, phone, address, profile_pic);
-    res.status(201).json(editedUser);
+    
+    // Hash the password if it is provided
+    let hashedPassword;
+    if (password) {
+      hashedPassword = await bcrypt.hash(password, saltRounds);
+    }
+    
+    const updatedUser = await editUser(id, username, hashedPassword, role, name, email, phone, address, profile_pic);
+    res.json(updatedUser);
   } catch (err) {
     console.error(err);
     res.status(500).send({ message: `Error updating user: ${err.message}` });
@@ -91,7 +106,7 @@ router.put('/:id', upload.single('profile_pic'), async (req, res) => {
 });
 
 // DELETE /users/:id
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, authorizeAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const message = await deleteUser(id);

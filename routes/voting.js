@@ -14,11 +14,14 @@ const {
     deleteVotingOption,
     submitVote,
     calculateVoteResults,
-    getVoteResultsByTopicId
+    getVoteResultsByTopicId,
+    getVoteResultWithUsers
 } = require('../database/voting.db');
+const authenticate = require('../middleware/authenticate');
+const { authorizeAdmin, authorizePengurus, authorizeSiswa } = require('../middleware/authorize');
 
 // Create a new voting topic
-router.post('/', upload.none(), async (req, res) => {
+router.post('/', authenticate, authorizePengurus, upload.none(), async (req, res) => {
     try {
         const { title, description } = req.body;
         const newTopic = await createVotingTopic(title, description);
@@ -30,7 +33,7 @@ router.post('/', upload.none(), async (req, res) => {
 });
 
 // Get all voting topics
-router.get('/', async (req, res) => {
+router.get('/', authenticate, authorizePengurus, authorizeSiswa, async (req, res) => {
     try {
         const topics = await getVotingTopics();
         res.json(topics);
@@ -38,10 +41,10 @@ router.get('/', async (req, res) => {
         console.error(err);
         res.status(500).send({ message: `Error retrieving voting topics: ${err.message}` });
     }
-});
+}); 
 
 // Get a single voting topic by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticate, authorizePengurus, authorizeSiswa, async (req, res) => {
     try {
         const { id } = req.params;
         const topic = await getVotingTopicById(id);
@@ -53,7 +56,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Update a voting topic
-router.put('/:id', upload.none(), async (req, res) => {
+router.put('/:id', authenticate, authorizePengurus, upload.none(), async (req, res) => {
     try {
         const { id } = req.params;
         const { title, description } = req.body;
@@ -66,7 +69,7 @@ router.put('/:id', upload.none(), async (req, res) => {
 });
 
 // Delete a voting topic
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, authorizePengurus, async (req, res) => {
     try {
         const { id } = req.params;
         const deletedTopic = await deleteVotingTopic(id);
@@ -82,7 +85,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Create a new voting option
-router.post('/:topicId/options', img.single('img'), async (req, res) => {
+router.post('/:topicId/options', authenticate, authorizePengurus, img.single('img'), async (req, res) => {
     try {
         const { topicId } = req.params;
         const { option } = req.body;
@@ -96,7 +99,7 @@ router.post('/:topicId/options', img.single('img'), async (req, res) => {
 });
 
 // Get voting options for a specific topic
-router.get('/:topicId/options', async (req, res) => {
+router.get('/:topicId/options', authenticate, authorizePengurus, authorizeSiswa, async (req, res) => {
     try {
         const { topicId } = req.params;
         const options = await getVotingOptionsByTopicId(topicId);
@@ -108,7 +111,7 @@ router.get('/:topicId/options', async (req, res) => {
 });
 
 // Delete a voting option
-router.delete('/:topicId/options/:id', async (req, res) => {
+router.delete('/:topicId/options/:id', authenticate, authorizePengurus, async (req, res) => {
     try {
         const { id } = req.params;
         const deletedOption = await deleteVotingOption(id);
@@ -124,7 +127,7 @@ router.delete('/:topicId/options/:id', async (req, res) => {
 });
 
 // Submit a vote
-router.post('/:topicId/vote', upload.none(), async (req, res) => {
+router.post('/:topicId/vote', authenticate, authorizePengurus, authorizeSiswa, upload.none(), async (req, res) => {
     try {
         const { topicId } = req.params;
         const { user_id, option_id } = req.body;
@@ -138,7 +141,7 @@ router.post('/:topicId/vote', upload.none(), async (req, res) => {
 });
 
 // Get vote results for a specific topic
-router.get('/:topicId/results', async (req, res) => {
+router.get('/:topicId/results', authenticate, authorizePengurus, async (req, res) => {
     try {
         const { topicId } = req.params;
         const results = await getVoteResultsByTopicId(topicId);
@@ -146,6 +149,18 @@ router.get('/:topicId/results', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send({ message: `Error retrieving vote results: ${err.message}` });
+    }
+});
+
+// Get a single vote result along with users who voted for it
+router.get('/:topicId/options/:optionId', authenticate, authorizePengurus, async (req, res) => {
+    try {
+        const { topicId, optionId } = req.params;
+        const result = await getVoteResultWithUsers(topicId, optionId);
+        res.json(result);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: `Error retrieving vote result: ${err.message}` });
     }
 });
 

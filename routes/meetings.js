@@ -4,9 +4,11 @@ const { getAbsenceRequestsByMeetingId, processAbsenceRequest } = require('../dat
 const multer = require('multer');
 const router = express.Router();
 const upload = multer();
+const authenticate = require('../middleware/authenticate');
+const { authorizeAdmin, authorizePengurus, authorizeSiswa } = require('../middleware/authorize');
 
 // Meeting Schedules
-router.get('/', async (req, res) => {
+router.get('/', authenticate, authorizeAdmin, authorizePengurus,  async (req, res) => {
     try {
         const meetings = await getMeetings();
         res.json(meetings);
@@ -17,7 +19,7 @@ router.get('/', async (req, res) => {
 });
 
 // Create a new meeting
-router.post('/', upload.none(), async (req, res) => {
+router.post('/', authenticate, authorizeAdmin, authorizePengurus, upload.none(), async (req, res) => {
     try {
         const { title, description, date, start_time, end_time } = req.body;
         const newMeeting = await createMeeting(title, description, date, start_time, end_time);
@@ -29,7 +31,7 @@ router.post('/', upload.none(), async (req, res) => {
 });
 
 // Get a single meeting
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticate, authorizeAdmin, authorizePengurus,  async (req, res) => {
     try {
         const { id } = req.params;
         const meeting = await getMeetingById(id);
@@ -45,7 +47,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Edit a meeting
-router.put('/:id', upload.none(), async (req, res) => {
+router.put('/:id', authenticate, authorizeAdmin, authorizePengurus, upload.none(), async (req, res) => {
     try {
         const { id } = req.params;
         const { title, description, date, start_time, end_time } = req.body;
@@ -62,7 +64,7 @@ router.put('/:id', upload.none(), async (req, res) => {
 });
 
 // Delete a meeting
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, authorizeAdmin, authorizePengurus,  async (req, res) => {
     try {
         const { id } = req.params;
         const deletedMeeting = await deleteMeeting(id);
@@ -78,7 +80,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Get absence requests for a specific meeting
-router.get('/:id/absence-requests', async (req, res) => {
+router.get('/:id/absence-requests', authenticate, authorizeAdmin,  async (req, res) => {
     try {
         const { id } = req.params;
         const absenceRequests = await getAbsenceRequestsByMeetingId(id);
@@ -90,7 +92,7 @@ router.get('/:id/absence-requests', async (req, res) => {
 });
 
 // Process an absence request
-router.post('/:meetingId/absence-requests/:id', upload.none(), async (req, res) => {
+router.post('/:meetingId/absence-requests/:id', authenticate, authorizeAdmin,  upload.none(), async (req, res) => {
     try {
         const { meetingId, id } = req.params;
         const { state } = req.body;

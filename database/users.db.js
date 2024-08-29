@@ -75,6 +75,24 @@ async function getUserById(id) {
   }
 }
 
+async function getUserByUsername(username) {
+  if (!username) {
+    throw new Error("Username is required");
+  }
+
+  const query = {
+    text: `SELECT * FROM users WHERE username = $1`,
+    values: [username],
+  };
+  try {
+    const result = await pool.query(query);
+    return result.rows[0];
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
 async function editUser(
   id,
   username,
@@ -165,4 +183,5 @@ module.exports = {
   getUserById,
   editUser,
   deleteUser,
+  getUserByUsername
 };

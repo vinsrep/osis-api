@@ -186,19 +186,35 @@ async function getVoteResultsByTopicId(voting_topic_id) {
     }
 }
 
-module.exports = {
-    createVotingTopic,
-    getVotingTopics,
-    getVotingTopicById,
-    updateVotingTopic,
-    deleteVotingTopic,
-    createVotingOption,
-    getVotingOptionsByTopicId,
-    deleteVotingOption,
-    submitVote,
-    calculateVoteResults,
-    getVoteResultsByTopicId,
-};
+async function getVoteResultWithUsers(voting_topic_id, option_id) {
+    const query = {
+        text: `
+            SELECT 
+                vo.id AS option_id,
+                vo.option AS option_title,
+                COUNT(v.id) AS vote_count,
+                json_agg(json_build_object('user_id', u.id, 'username', u.username)) AS users
+            FROM 
+                voting_options vo
+            LEFT JOIN 
+                votes v ON vo.id = v.option_id
+            LEFT JOIN 
+                users u ON v.user_id = u.id
+            WHERE 
+                vo.voting_topic_id = $1 AND vo.id = $2
+            GROUP BY 
+                vo.id
+        `,
+        values: [voting_topic_id, option_id],
+    };
+    try {
+        const result = await pool.query(query);
+        return result.rows[0];
+    } catch (err) {
+        console.error('Error retrieving vote result with users:', err);
+        throw new Error('Error retrieving vote result with users');
+    }
+}
 
 module.exports = {
     createVotingTopic,
@@ -212,4 +228,5 @@ module.exports = {
     submitVote,
     calculateVoteResults,
     getVoteResultsByTopicId,
+    getVoteResultWithUsers
 };
