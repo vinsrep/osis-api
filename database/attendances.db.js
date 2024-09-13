@@ -1,11 +1,11 @@
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'db_osis',
-  password: '',
-  port: 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 
 // Function to get attendances by meeting schedule ID
@@ -41,10 +41,10 @@ async function getMeetingScheduleWithAttendances(meetingScheduleId) {
   };
 }
 
-// Example usage
-getMeetingScheduleWithAttendances(1)
-  .then(data => console.log(data))
-  .catch(err => console.error(err));
+// // Example usage
+// getMeetingScheduleWithAttendances(1)
+//   .then(data => console.log(data))
+//   .catch(err => console.error(err));
 
 
 // Function to get all attendances

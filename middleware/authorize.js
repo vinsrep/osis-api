@@ -1,16 +1,16 @@
 const { Pool } = require("pg");
 
 const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "db_osis",
-  password: "",
-  port: 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 
 function authorizeRoles(...allowedRoles) {
   return (req, res, next) => {
-    console.log('req.user:', req.user); // Add this line for debugging
+    // console.log('req.user:', req.user);
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).send({ error: 'Access denied.' });
     }
