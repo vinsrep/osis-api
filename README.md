@@ -87,7 +87,7 @@ npm start server
 [issues-url]: https://github.com/vinsrep/osis-api/issues
 [license-shield]: https://img.shields.io/github/license/vinsrep/osis-api.svg?style=for-the-badge
 [license-url]: https://github.com/vinsrep/osis-api/blob/main/LICENSE.txt
-[Express.js]: https://img.shields.io/badge/Express%20js-000000?style=for-the-badge&logo=express&logoColor=white
+[Express.js]: https://img.shields.io/badge/Express.js-%23404d59.svg?logo=express&logoColor=%2361DAFB
 [Express-url]: https://expressjs.org/
 [Node.js]: https://img.shields.io/badge/Node.js-6DA55F?logo=node.js&logoColor=white
 [Node-url]: https://nodejs.org/
