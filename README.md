@@ -42,7 +42,7 @@
 * [![React][React.js]][React-url] (Front-end)
 
 # Installation guide
-To setup the API on your device, follow the guide below:
+To install the API on your device, follow the guide below:
 1. In the command prompt or terminal of your choice, clone the project:
 ```
 git clone https://github.com/vinsrep/osis-api
@@ -54,6 +54,21 @@ cd osis-api
 3. Install the dependencies
 ```
 npm install
+```
+
+# Setup
+To setup the API on your device, follow the guide below:
+1. Copy .env.example and rename it to .env
+```
+cp .env.example .env
+```
+2. Generate a new JWT key using Node
+```
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+3. Copy the token and paste it within .env
+```
+JWT_SECRET=paste-the-generated-string-here
 ```
 4. Start the server
 ```
