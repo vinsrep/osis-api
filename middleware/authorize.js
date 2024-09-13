@@ -8,29 +8,16 @@ const pool = new Pool({
   port: 5432,
 });
 
-function authorizeAdmin(req, res, next) {
-  if (req.user.role !== 'admin') {
-    return res.status(403).send({ error: 'Access denied.' });
-  }
-  next();
-}
-
-function authorizePengurus(req, res, next) {
-  if (req.user.role !== 'pengurus') {
-    return res.status(403).send({ error: 'Access denied.' });
-  }
-  next();
-}
-
-function authorizeSiswa(req, res, next) {
-  if (req.user.role !== 'siswa') {
-    return res.status(403).send({ error: 'Access denied.' });
-  }
-  next();
+function authorizeRoles(...allowedRoles) {
+  return (req, res, next) => {
+    console.log('req.user:', req.user); // Add this line for debugging
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).send({ error: 'Access denied.' });
+    }
+    next();
+  };
 }
 
 module.exports = {
-  authorizeAdmin,
-  authorizePengurus,
-  authorizeSiswa,
+  authorizeRoles,
 };

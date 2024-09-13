@@ -5,10 +5,10 @@ const multer = require('multer');
 const router = express.Router();
 const upload = multer();
 const authenticate = require('../middleware/authenticate');
-const { authorizeAdmin, authorizePengurus, authorizeSiswa } = require('../middleware/authorize');
+const { authorizeRoles } = require('../middleware/authorize');
 
 // Meeting Schedules
-router.get('/', authenticate, authorizeAdmin, authorizePengurus,  async (req, res) => {
+router.get('/', authenticate, authorizeRoles('admin','pengurus'),  async (req, res) => {
     try {
         const meetings = await getMeetings();
         res.json(meetings);
@@ -19,7 +19,7 @@ router.get('/', authenticate, authorizeAdmin, authorizePengurus,  async (req, re
 });
 
 // Create a new meeting
-router.post('/', authenticate, authorizeAdmin, authorizePengurus, upload.none(), async (req, res) => {
+router.post('/', authenticate, authorizeRoles('admin','pengurus'), upload.none(), async (req, res) => {
     try {
         const { title, description, date, start_time, end_time } = req.body;
         const newMeeting = await createMeeting(title, description, date, start_time, end_time);
@@ -31,7 +31,7 @@ router.post('/', authenticate, authorizeAdmin, authorizePengurus, upload.none(),
 });
 
 // Get a single meeting
-router.get('/:id', authenticate, authorizeAdmin, authorizePengurus,  async (req, res) => {
+router.get('/:id', authenticate, authorizeRoles('admin','pengurus'),  async (req, res) => {
     try {
         const { id } = req.params;
         const meeting = await getMeetingById(id);
@@ -47,7 +47,7 @@ router.get('/:id', authenticate, authorizeAdmin, authorizePengurus,  async (req,
 });
 
 // Edit a meeting
-router.put('/:id', authenticate, authorizeAdmin, authorizePengurus, upload.none(), async (req, res) => {
+router.put('/:id', authenticate, authorizeRoles('admin','pengurus'), upload.none(), async (req, res) => {
     try {
         const { id } = req.params;
         const { title, description, date, start_time, end_time } = req.body;
@@ -64,7 +64,7 @@ router.put('/:id', authenticate, authorizeAdmin, authorizePengurus, upload.none(
 });
 
 // Delete a meeting
-router.delete('/:id', authenticate, authorizeAdmin, authorizePengurus,  async (req, res) => {
+router.delete('/:id', authenticate, authorizeRoles('admin','pengurus'),  async (req, res) => {
     try {
         const { id } = req.params;
         const deletedMeeting = await deleteMeeting(id);
@@ -80,7 +80,7 @@ router.delete('/:id', authenticate, authorizeAdmin, authorizePengurus,  async (r
 });
 
 // Get absence requests for a specific meeting
-router.get('/:id/absence-requests', authenticate, authorizeAdmin,  async (req, res) => {
+router.get('/:id/absence-requests', authenticate, authorizeRoles('admin','pengurus'),  async (req, res) => {
     try {
         const { id } = req.params;
         const absenceRequests = await getAbsenceRequestsByMeetingId(id);
@@ -92,7 +92,7 @@ router.get('/:id/absence-requests', authenticate, authorizeAdmin,  async (req, r
 });
 
 // Process an absence request
-router.post('/:meetingId/absence-requests/:id', authenticate, authorizeAdmin,  upload.none(), async (req, res) => {
+router.post('/:meetingId/absence-requests/:id', authenticate, authorizeRoles('admin','pengurus'),  upload.none(), async (req, res) => {
     try {
         const { meetingId, id } = req.params;
         const { state } = req.body;

@@ -4,7 +4,7 @@ const upload = require('../uploads/upload'); // Import the upload configuration
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const authenticate = require('../middleware/authenticate');
-const { authorizeAdmin, authorizePengurus, authorizeSiswa } = require('../middleware/authorize');
+const { authorizeRoles } = require('../middleware/authorize');
 const {
   getAttendanceLogForAllUsers,
   getAttendanceLogForUser,
@@ -18,7 +18,7 @@ const {
 } = require('../database/users.db');
 
 // route to get attendance log for every user
-router.get('/attendance-log', authenticate, authorizeAdmin, async (req, res) => {
+router.get('/attendance-log', authenticate, authorizeRoles('admin'), async (req, res) => {
   try {
     const attendanceLog = await getAttendanceLogForAllUsers();
     res.json(attendanceLog);
@@ -29,7 +29,7 @@ router.get('/attendance-log', authenticate, authorizeAdmin, async (req, res) => 
 });
 
 // route to get attendance log for a specific user
-router.get('/:id/attendance-log', authenticate, authorizeAdmin, async (req, res) => {
+router.get('/:id/attendance-log', authenticate, authorizeRoles('admin'), async (req, res) => {
   try {
     const { id } = req.params;
     const attendanceLog = await getAttendanceLogForUser(id);
@@ -68,7 +68,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /users
-router.post('/', authenticate, authorizeAdmin, upload.single('profile_pic'),  async (req, res) => {
+router.post('/', authenticate, authorizeRoles('admin'), upload.single('profile_pic'),  async (req, res) => {
   try {
     const { username, password, role, name, email, phone, address } = req.body;
     const profile_pic = req.file ? `/uploads/images/${req.file.filename}` : null;
@@ -85,7 +85,7 @@ router.post('/', authenticate, authorizeAdmin, upload.single('profile_pic'),  as
 });
 
 // PUT /users/:id
-router.put('/:id', authenticate, authorizeAdmin, upload.single('profile_pic'), async (req, res) => {
+router.put('/:id', authenticate, authorizeRoles('admin'), upload.single('profile_pic'), async (req, res) => {
   try {
     const { id } = req.params;
     const { username, password, role, name, email, phone, address } = req.body;
@@ -106,7 +106,7 @@ router.put('/:id', authenticate, authorizeAdmin, upload.single('profile_pic'), a
 });
 
 // DELETE /users/:id
-router.delete('/:id', authenticate, authorizeAdmin, async (req, res) => {
+router.delete('/:id', authenticate, authorizeRoles('admin'), async (req, res) => {
   try {
     const { id } = req.params;
     const message = await deleteUser(id);

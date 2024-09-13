@@ -18,10 +18,10 @@ const {
     getVoteResultWithUsers
 } = require('../database/voting.db');
 const authenticate = require('../middleware/authenticate');
-const { authorizeAdmin, authorizePengurus, authorizeSiswa } = require('../middleware/authorize');
+const { authorizeRoles } = require('../middleware/authorize');
 
 // Create a new voting topic
-router.post('/', authenticate, authorizePengurus, upload.none(), async (req, res) => {
+router.post('/', authenticate, authorizeRoles('admin','pengurus','siswa'), upload.none(), async (req, res) => {
     try {
         const { title, description } = req.body;
         const newTopic = await createVotingTopic(title, description);
@@ -33,7 +33,7 @@ router.post('/', authenticate, authorizePengurus, upload.none(), async (req, res
 });
 
 // Get all voting topics
-router.get('/', authenticate, authorizePengurus, authorizeSiswa, async (req, res) => {
+router.get('/', authenticate, authorizeRoles('admin','pengurus','siswa'), async (req, res) => {
     try {
         const topics = await getVotingTopics();
         res.json(topics);
@@ -44,7 +44,7 @@ router.get('/', authenticate, authorizePengurus, authorizeSiswa, async (req, res
 }); 
 
 // Get a single voting topic by ID
-router.get('/:id', authenticate, authorizePengurus, authorizeSiswa, async (req, res) => {
+router.get('/:id', authenticate, authorizeRoles('admin','pengurus','siswa'), async (req, res) => {
     try {
         const { id } = req.params;
         const topic = await getVotingTopicById(id);
@@ -56,7 +56,7 @@ router.get('/:id', authenticate, authorizePengurus, authorizeSiswa, async (req, 
 });
 
 // Update a voting topic
-router.put('/:id', authenticate, authorizePengurus, upload.none(), async (req, res) => {
+router.put('/:id', authenticate, authorizeRoles('admin','pengurus','siswa'), upload.none(), async (req, res) => {
     try {
         const { id } = req.params;
         const { title, description } = req.body;
@@ -69,7 +69,7 @@ router.put('/:id', authenticate, authorizePengurus, upload.none(), async (req, r
 });
 
 // Delete a voting topic
-router.delete('/:id', authenticate, authorizePengurus, async (req, res) => {
+router.delete('/:id', authenticate, authorizeRoles('admin','pengurus','siswa'), async (req, res) => {
     try {
         const { id } = req.params;
         const deletedTopic = await deleteVotingTopic(id);
@@ -85,7 +85,7 @@ router.delete('/:id', authenticate, authorizePengurus, async (req, res) => {
 });
 
 // Create a new voting option
-router.post('/:topicId/options', authenticate, authorizePengurus, img.single('img'), async (req, res) => {
+router.post('/:topicId/options', authenticate, authorizeRoles('admin','pengurus','siswa'), img.single('img'), async (req, res) => {
     try {
         const { topicId } = req.params;
         const { option } = req.body;
@@ -99,7 +99,7 @@ router.post('/:topicId/options', authenticate, authorizePengurus, img.single('im
 });
 
 // Get voting options for a specific topic
-router.get('/:topicId/options', authenticate, authorizePengurus, authorizeSiswa, async (req, res) => {
+router.get('/:topicId/options', authenticate, authorizeRoles('admin','pengurus','siswa'), async (req, res) => {
     try {
         const { topicId } = req.params;
         const options = await getVotingOptionsByTopicId(topicId);
@@ -111,7 +111,7 @@ router.get('/:topicId/options', authenticate, authorizePengurus, authorizeSiswa,
 });
 
 // Delete a voting option
-router.delete('/:topicId/options/:id', authenticate, authorizePengurus, async (req, res) => {
+router.delete('/:topicId/options/:id', authenticate, authorizeRoles('admin','pengurus','siswa'), async (req, res) => {
     try {
         const { id } = req.params;
         const deletedOption = await deleteVotingOption(id);
@@ -127,7 +127,7 @@ router.delete('/:topicId/options/:id', authenticate, authorizePengurus, async (r
 });
 
 // Submit a vote
-router.post('/:topicId/vote', authenticate, authorizePengurus, authorizeSiswa, upload.none(), async (req, res) => {
+router.post('/:topicId/vote', authenticate, authorizeRoles('admin','pengurus','siswa'), upload.none(), async (req, res) => {
     try {
         const { topicId } = req.params;
         const { user_id, option_id } = req.body;
@@ -141,7 +141,7 @@ router.post('/:topicId/vote', authenticate, authorizePengurus, authorizeSiswa, u
 });
 
 // Get vote results for a specific topic
-router.get('/:topicId/results', authenticate, authorizePengurus, async (req, res) => {
+router.get('/:topicId/results', authenticate, authorizeRoles('admin','pengurus','siswa'), async (req, res) => {
     try {
         const { topicId } = req.params;
         const results = await getVoteResultsByTopicId(topicId);
@@ -153,7 +153,7 @@ router.get('/:topicId/results', authenticate, authorizePengurus, async (req, res
 });
 
 // Get a single vote result along with users who voted for it
-router.get('/:topicId/options/:optionId', authenticate, authorizePengurus, async (req, res) => {
+router.get('/:topicId/options/:optionId', authenticate, authorizeRoles('admin','pengurus','siswa'), async (req, res) => {
     try {
         const { topicId, optionId } = req.params;
         const result = await getVoteResultWithUsers(topicId, optionId);

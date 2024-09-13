@@ -4,10 +4,10 @@ const multer = require('multer');
 const upload = multer();
 const { createAttendance, getAttendances, getAttendanceById, editAttendance, deleteAttendance } = require('../database/attendances.db.js');
 const authenticate = require('../middleware/authenticate');
-const { authorizeAdmin, authorizePengurus, authorizeSiswa } = require('../middleware/authorize');
+const { authorizeRoles } = require('../middleware/authorize');
 
 // Attendance Schedules
-router.get('/', authenticate, authorizeAdmin, authorizePengurus, async (req, res) => {
+router.get('/', authenticate, authorizeRoles('admin','pengurus'), async (req, res) => {
     try {
         const attendances = await getAttendances();
         res.json(attendances);
@@ -18,7 +18,7 @@ router.get('/', authenticate, authorizeAdmin, authorizePengurus, async (req, res
 });
 
 // Create a new attendance
-router.post('/', authenticate, authorizeAdmin, upload.none(), async (req, res) => {
+router.post('/', authenticate, authorizeRoles('admin',), upload.none(), async (req, res) => {
     try {
         const { user_id, meeting_schedule_id, status, note } = req.body;
         const newAttendance = await createAttendance(user_id, meeting_schedule_id, status, note);
@@ -30,7 +30,7 @@ router.post('/', authenticate, authorizeAdmin, upload.none(), async (req, res) =
 });
 
 // Get a single attendance
-router.get('/:id', authenticate, authorizeAdmin, authorizePengurus, async (req, res) => {
+router.get('/:id', authenticate, authorizeRoles('admin','pengurus'), async (req, res) => {
     try {
         const { id } = req.params;
         const attendance = await getAttendanceById(id);
@@ -46,7 +46,7 @@ router.get('/:id', authenticate, authorizeAdmin, authorizePengurus, async (req, 
 });
 
 // Edit an attendance
-router.put('/:id', authenticate, authorizeAdmin, upload.none(), async (req, res) => {
+router.put('/:id', authenticate, authorizeRoles('admin',), upload.none(), async (req, res) => {
     try {
         const { id } = req.params;
         const { user_id, meeting_schedule_id, status, note } = req.body;
@@ -63,7 +63,7 @@ router.put('/:id', authenticate, authorizeAdmin, upload.none(), async (req, res)
 });
 
 // Delete an attendance
-router.delete('/:id', authenticate, authorizeAdmin, async (req, res) => {
+router.delete('/:id', authenticate, authorizeRoles('admin',), async (req, res) => {
     try {
         const { id } = req.params;
         const deletedAttendance = await deleteAttendance(id);
