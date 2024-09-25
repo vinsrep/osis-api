@@ -12,7 +12,7 @@ const {
 } = require("../database/absenceRequests.db");
 
 // GET /absence-requests
-router.get("/", authenticate, authorizeRoles('admin','pengurus'), async (req, res) => {
+router.get("/", authenticate, authorizeRoles('admin', 'pengurus'), async (req, res) => {
     try {
         const absenceRequests = await getAbsenceRequests();
         res.json(absenceRequests);
@@ -25,7 +25,7 @@ router.get("/", authenticate, authorizeRoles('admin','pengurus'), async (req, re
 });
 
 // GET /absence-requests/:id
-router.get("/:id", authenticate, authorizeRoles('admin','pengurus'), async (req, res) => {
+router.get("/:id", authenticate, authorizeRoles('admin', 'pengurus'), async (req, res) => {
     try {
         const { id } = req.params;
         const absenceRequest = await getAbsenceRequestById(id);
@@ -43,7 +43,7 @@ router.get("/:id", authenticate, authorizeRoles('admin','pengurus'), async (req,
 });
 
 // POST /absence-requests
-router.post("/", authenticate, authorizeRoles('admin','pengurus'), upload, async (req, res) => {
+router.post("/", authenticate, authorizeRoles('admin', 'pengurus'), upload, async (req, res) => {
     try {
         const { user_id, meeting_schedule_id, reason } = req.body;
         const newRequest = await createAbsenceRequest(
@@ -61,7 +61,7 @@ router.post("/", authenticate, authorizeRoles('admin','pengurus'), upload, async
 });
 
 // PUT /absence-requests/:id
-router.put("/:id", authenticate, authorizeRoles('admin','pengurus'), upload, async (req, res) => {
+router.put("/:id", authenticate, authorizeRoles('admin', 'pengurus'), upload, async (req, res) => {
     try {
         const { id } = req.params;
         const { reason } = req.body;

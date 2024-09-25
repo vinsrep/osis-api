@@ -1,6 +1,6 @@
 <!--![image](https://github.com/user-attachments/assets/ae75fec0-de08-40c8-a32e-0684992f6e2f)-->
-<a id="readme-top"></a>
 
+<a id="readme-top"></a>
 
 <!-- PROJECT SHIELDS -->
 <!--
@@ -10,12 +10,12 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
+
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-
 
 <!-- PROJECT LOGO -->
 <br />
@@ -38,45 +38,62 @@
 
 ### Built With
 
-* [![Express][Express.js]][Express-url]
-* [![Node][Node.js]][Node-url]
+- [![Express][Express.js]][Express-url]
+- [![Node][Node.js]][Node-url]
 
 # Installation guide
+
 To install the API on your device, follow the guide below:
+
 1. In the command prompt or terminal of your choice, clone the project:
+
 ```
 git clone https://github.com/vinsrep/osis-api
 ```
+
 2. Go inside the folder
+
 ```
 cd osis-api
 ```
+
 3. Install the dependencies
+
 ```
 npm install
 ```
 
 # Setup
+
 To setup the API on your device, follow the guide below:
+
 1. Copy .env.example and rename it to .env
+
 ```
 cp .env.example .env
 ```
+
 2. Generate a new JWT key using Node
+
 ```
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
+
 3. Copy the token and paste it within .env
+
 ```
 JWT_SECRET=paste-the-generated-string-here
 ```
+
 4. Start the server
+
 ```
 npm start server
 ```
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
 [contributors-shield]: https://img.shields.io/github/contributors/vinsrep/osis-api.svg?style=for-the-badge
 [contributors-url]: https://github.com/vinsrep/osis-api/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/vinsrep/osis-api.svg?style=for-the-badge

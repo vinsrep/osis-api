@@ -83,10 +83,8 @@ router.put('/:id', authenticate, authorizeRoles('admin', 'pengurus'), upload.non
 // Delete a news article
 router.delete('/:id', authenticate, authorizeRoles('admin', 'pengurus'), async (req, res) => {
     const { id } = req.params;
-    const author_id = req.user.id;
-
     try {
-        const deletedNews = await deleteNewsById(id, author_id);
+        await deleteNewsById(id);
         res.json({ message: "Article deleted" });
     } catch (err) {
         console.error(err);

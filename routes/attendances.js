@@ -7,7 +7,7 @@ const authenticate = require('../middleware/authenticate');
 const { authorizeRoles } = require('../middleware/authorize');
 
 // Attendance Schedules
-router.get('/', authenticate, authorizeRoles('admin','pengurus'), async (req, res) => {
+router.get('/', authenticate, authorizeRoles('admin', 'pengurus'), async (req, res) => {
     try {
         const attendances = await getAttendances();
         res.json(attendances);
@@ -30,7 +30,7 @@ router.post('/', authenticate, authorizeRoles('admin',), upload.none(), async (r
 });
 
 // Get a single attendance
-router.get('/:id', authenticate, authorizeRoles('admin','pengurus'), async (req, res) => {
+router.get('/:id', authenticate, authorizeRoles('admin', 'pengurus'), async (req, res) => {
     try {
         const { id } = req.params;
         const attendance = await getAttendanceById(id);
