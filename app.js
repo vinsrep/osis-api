@@ -11,6 +11,7 @@ var usersRouter = require('./routes/users');
 var meetingsRouter = require('./routes/meetings');
 var attendancesRouter = require('./routes/attendances');
 var absenceRequestsRouter = require('./routes/absenceRequests');
+var newsRouter = require('./routes/news');
 var votingRouter = require('./routes/voting');
 var loginRouter = require('./routes/login');
 
@@ -30,6 +31,7 @@ app.use('/users', usersRouter);
 app.use('/meetings', meetingsRouter);
 app.use('/attendances', attendancesRouter);
 app.use('/absence-requests', absenceRequestsRouter);
+app.use('/news', newsRouter);
 app.use('/voting', votingRouter);
 app.use('/login', loginRouter);
 
@@ -51,6 +53,6 @@ app.use(function (err, req, res, next) {
 });
 
 const port = 3000;
-app.listen(port, () => {
-  console.log(`Server started on port ${port}`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server is running on port ${port}`);
 });
