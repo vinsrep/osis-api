@@ -52,7 +52,7 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
-const port = 3000;
+const port = 1500;
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on port ${port}`);
 });
