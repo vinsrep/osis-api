@@ -42,7 +42,7 @@ router.get('/:id/attendance-log', authenticate, authorizeRoles('admin'), async (
 
 
 // GET all users
-router.get('/', async (req, res) => {
+router.get('/', authenticate, authorizeRoles('admin'), async (req, res) => {
   try {
     const users = await getUsers();
     res.json(users);
@@ -53,7 +53,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET /users/:id
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticate, authorizeRoles('admin'), async (req, res) => {
   try {
     const { id } = req.params;
     const user = await getUserById(id);
