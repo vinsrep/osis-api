@@ -40,6 +40,19 @@ router.get('/:id/attendance-log', authenticate, authorizeRoles('admin'), async (
   }
 });
 
+// GET the currently logged-in user
+router.get('/me', authenticate, async (req, res) => {
+  try {
+    const user = await getUserById(req.user.id);
+    if (!user) {
+      return res.status(404).send({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: `Error fetching user: ${err.message}` });
+  }
+});
 
 // GET all users
 router.get('/', authenticate, authorizeRoles('admin'), async (req, res) => {
