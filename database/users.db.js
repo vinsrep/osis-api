@@ -1,4 +1,6 @@
 const { Pool } = require("pg");
+const fs = require('fs');
+const path = require('path')
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -170,12 +172,33 @@ async function deleteUser(id) {
     throw new Error("ID is required");
   }
 
+  // Fetch the user's profile picture path
+  const user = await getUserById(id);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const profilePicPath = user.profile_pic;
+
   const query = {
     text: `DELETE FROM users WHERE id = $1`,
     values: [id],
   };
   try {
     await pool.query(query);
+
+    // Delete the profile picture if it exists
+    if (profilePicPath) {
+      const filePath = path.join(__dirname, '..', profilePicPath);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(`Error deleting profile picture: ${err.message}`);
+        } else {
+          console.log(`Profile picture deleted: ${filePath}`);
+        }
+      });
+    }
+
     return "User has been deleted.";
   } catch (err) {
     console.error(err);
