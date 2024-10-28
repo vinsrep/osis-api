@@ -16,14 +16,15 @@ async function createUser(
   email,
   phone,
   address,
-  profile_pic
+  profile_pic,
+  angkatan
 ) {
   if (!username || !password || !role) {
     throw new Error("Username, password, and role are required");
   }
 
   const query = {
-    text: `INSERT INTO users (username, password, role, name, email, phone, address, profile_pic) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+    text: `INSERT INTO users (username, password, role, name, email, phone, address, profile_pic, angkatan) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
     values: [
       username,
       password,
@@ -33,6 +34,7 @@ async function createUser(
       phone || null,
       address || null,
       profile_pic || null,
+      angkatan || null,
     ],
   };
   try {
@@ -102,7 +104,8 @@ async function editUser(
   email,
   phone,
   address,
-  profile_pic
+  profile_pic,
+  angkatan
 ) {
   if (
     !id ||
@@ -113,10 +116,11 @@ async function editUser(
       !email &&
       !phone &&
       !address &&
-      !profile_pic)
+      !profile_pic &&
+      !angkatan)
   ) {
     throw new Error(
-      "ID is required and at least one of username, password, role, name, email, phone, address, or profile_pic must be provided"
+      "ID is required and at least one of username, password, role, name, email, phone, address, profile_pic, or angkatan must be provided"
     );
   }
 
@@ -134,10 +138,11 @@ async function editUser(
     phone: phone || existingUser.phone,
     address: address || existingUser.address,
     profile_pic: profile_pic || existingUser.profile_pic,
+    angkatan: angkatan || existingUser.angkatan,
   };
 
   const query = {
-    text: `UPDATE users SET username = $1, password = $2, role = $3, name = $4, email = $5, phone = $6, address = $7, profile_pic = $8, updated_at = CURRENT_TIMESTAMP WHERE id = $9 RETURNING *`,
+    text: `UPDATE users SET username = $1, password = $2, role = $3, name = $4, email = $5, phone = $6, address = $7, profile_pic = $8, angkatan = $9, updated_at = CURRENT_TIMESTAMP WHERE id = $10 RETURNING *`,
     values: [
       updatedUser.username,
       updatedUser.password,
@@ -147,6 +152,7 @@ async function editUser(
       updatedUser.phone,
       updatedUser.address,
       updatedUser.profile_pic,
+      updatedUser.angkatan,
       id,
     ],
   };
@@ -183,5 +189,5 @@ module.exports = {
   getUserById,
   editUser,
   deleteUser,
-  getUserByUsername
+  getUserByUsername,
 };

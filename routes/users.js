@@ -81,15 +81,15 @@ router.get('/:id', authenticate, authorizeRoles('admin'), async (req, res) => {
 });
 
 // POST /users
-router.post('/', authenticate, authorizeRoles('admin'), upload.single('profile_pic'), async (req, res) => {
+router.post('/', upload.single('profile_pic'), async (req, res) => {
   try {
-    const { username, password, role, name, email, phone, address } = req.body;
+    const { username, password, role, name, email, phone, address, angkatan } = req.body;
     const profile_pic = req.file ? `/uploads/images/${req.file.filename}` : null;
-
+    
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    const newUser = await createUser(username, hashedPassword, role, name, email, phone, address, profile_pic);
+    
+    const newUser = await createUser(username, hashedPassword, role, name, email, phone, address, profile_pic, angkatan);
     res.json(newUser);
   } catch (err) {
     console.error(err);
@@ -98,19 +98,19 @@ router.post('/', authenticate, authorizeRoles('admin'), upload.single('profile_p
 });
 
 // PUT /users/:id
-router.put('/:id', authenticate, authorizeRoles('admin'), upload.single('profile_pic'), async (req, res) => {
+router.put('/:id', upload.single('profile_pic'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, password, role, name, email, phone, address } = req.body;
+    const { username, password, role, name, email, phone, address, angkatan } = req.body;
     const profile_pic = req.file ? `/uploads/images/${req.file.filename}` : null;
-
+    
     // Hash the password if it is provided
     let hashedPassword;
     if (password) {
       hashedPassword = await bcrypt.hash(password, saltRounds);
     }
-
-    const updatedUser = await editUser(id, username, hashedPassword, role, name, email, phone, address, profile_pic);
+    
+    const updatedUser = await editUser(id, username, hashedPassword, role, name, email, phone, address, profile_pic, angkatan);
     res.json(updatedUser);
   } catch (err) {
     console.error(err);
