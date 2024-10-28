@@ -160,6 +160,19 @@ async function editUser(
   };
   try {
     const result = await pool.query(query);
+
+    // Delete the old profile picture if a new one is provided
+    if (profile_pic && existingUser.profile_pic && profile_pic !== existingUser.profile_pic) {
+      const oldProfilePicPath = path.join(__dirname, '..', existingUser.profile_pic);
+      fs.unlink(oldProfilePicPath, (err) => {
+        if (err) {
+          console.error(`Error deleting old profile picture: ${err.message}`);
+        } else {
+          console.log(`Old profile picture deleted: ${oldProfilePicPath}`);
+        }
+      });
+    }
+
     return result.rows[0];
   } catch (err) {
     console.error(err);
