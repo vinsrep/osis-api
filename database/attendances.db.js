@@ -80,16 +80,48 @@ async function getAttendanceById(attendanceId) {
 }
 
 // Function to update an attendance record by ID
-async function editAttendanceById(attendanceId, status, note) {
-  const query = `
-      UPDATE attendances
-      SET status = $2, note = $3, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $1
-      RETURNING *
-    `;
-  const values = [attendanceId, status, note];
-  const res = await pool.query(query, values);
-  return res.rows[0];
+async function editAttendanceById(id, user_id, meeting_schedule_id, status, note) {
+  if (!id) {
+    throw new Error("ID is required");
+  }
+
+  const existingAttendance = await getAttendanceById(id);
+  if (!existingAttendance) {
+    throw new Error("Attendance not found");
+  }
+
+  const updatedAttendance = {
+    user_id: user_id !== undefined ? user_id : existingAttendance.user_id,
+    meeting_schedule_id: meeting_schedule_id !== undefined ? meeting_schedule_id : existingAttendance.meeting_schedule_id,
+    status: status !== undefined ? status : existingAttendance.status,
+    note: note !== undefined ? note : existingAttendance.note,
+  };
+
+  const query = {
+    text: `UPDATE attendances SET user_id = $1, meeting_schedule_id = $2, status = $3, note = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 RETURNING *`,
+    values: [
+      updatedAttendance.user_id,
+      updatedAttendance.meeting_schedule_id,
+      updatedAttendance.status,
+      updatedAttendance.note,
+      id,
+    ],
+  };
+  try {
+    const result = await pool.query(query);
+
+    // Update the joined attendance in meetings
+    const updateMeetingQuery = {
+      text: `UPDATE meeting_schedules SET updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
+      values: [updatedAttendance.meeting_schedule_id],
+    };
+    await pool.query(updateMeetingQuery);
+
+    return result.rows[0];
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 }
 
 // Function to delete an attendance record by ID
