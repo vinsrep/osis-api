@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const upload = multer();
-const { createAttendance, getAttendances, getAttendanceById, editAttendance, deleteAttendance } = require('../database/attendances.db.js');
+const { createAttendance, getAttendances, getAttendanceById, editAttendanceById, deleteAttendanceById } = require('../database/attendances.db.js');
 const authenticate = require('../middleware/authenticate');
 const { authorizeRoles } = require('../middleware/authorize');
 
@@ -50,7 +50,7 @@ router.put('/:id', authenticate, authorizeRoles('admin',), upload.none(), async 
     try {
         const { id } = req.params;
         const { user_id, meeting_schedule_id, status, note } = req.body;
-        const editedAttendance = await editAttendance(id, user_id, meeting_schedule_id, status, note);
+        const editedAttendance = await editAttendanceById(id, user_id, meeting_schedule_id, status, note);
         if (!editedAttendance) {
             res.status(404).send({ message: 'Attendance not found' });
         } else {
@@ -66,7 +66,7 @@ router.put('/:id', authenticate, authorizeRoles('admin',), upload.none(), async 
 router.delete('/:id', authenticate, authorizeRoles('admin',), async (req, res) => {
     try {
         const { id } = req.params;
-        const deletedAttendance = await deleteAttendance(id);
+        const deletedAttendance = await deleteAttendanceById(id);
         if (!deletedAttendance) {
             res.status(404).send({ message: 'Attendance not found' });
         } else {
