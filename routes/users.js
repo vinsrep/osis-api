@@ -83,13 +83,13 @@ router.get('/:id', authenticate, authorizeRoles('admin','pengurus'), async (req,
 // POST /users
 router.post('/', upload.single('profile_pic'), async (req, res) => {
   try {
-    const { username, password, role, name, email, phone, address, angkatan } = req.body;
+    const { username, password, role, name, email, phone, address, angkatan, div } = req.body;
     const profile_pic = req.file ? `/uploads/images/${req.file.filename}` : null;
     
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     
-    const newUser = await createUser(username, hashedPassword, role, name, email, phone, address, profile_pic, angkatan);
+    const newUser = await createUser(username, hashedPassword, role, name, email, phone, address, profile_pic, angkatan, div);
     res.json(newUser);
   } catch (err) {
     console.error(err);
@@ -101,7 +101,7 @@ router.post('/', upload.single('profile_pic'), async (req, res) => {
 router.put('/:id', upload.single('profile_pic'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, password, role, name, email, phone, address, angkatan } = req.body;
+    const { username, password, role, name, email, phone, address, angkatan, div } = req.body;
     const profile_pic = req.file ? `/uploads/images/${req.file.filename}` : null;
     
     // Hash the password if it is provided
@@ -110,7 +110,7 @@ router.put('/:id', upload.single('profile_pic'), async (req, res) => {
       hashedPassword = await bcrypt.hash(password, saltRounds);
     }
     
-    const updatedUser = await editUser(id, username, hashedPassword, role, name, email, phone, address, profile_pic, angkatan);
+    const updatedUser = await editUser(id, username, hashedPassword, role, name, email, phone, address, profile_pic, angkatan, div);
     res.json(updatedUser);
   } catch (err) {
     console.error(err);

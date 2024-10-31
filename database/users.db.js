@@ -1,6 +1,6 @@
-const { Pool } = require("pg");
+const { Pool } = require('pg');
 const fs = require('fs');
-const path = require('path')
+const path = require('path');
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -9,44 +9,6 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
 });
-
-async function createUser(
-  username,
-  password,
-  role,
-  name,
-  email,
-  phone,
-  address,
-  profile_pic,
-  angkatan
-) {
-  if (!username || !password || !role) {
-    throw new Error("Username, password, and role are required");
-  }
-
-  const query = {
-    text: `INSERT INTO users (username, password, role, name, email, phone, address, profile_pic, angkatan) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-    values: [
-      username,
-      password,
-      role,
-      name || null,
-      email || null,
-      phone || null,
-      address || null,
-      profile_pic || null,
-      angkatan || null,
-    ],
-  };
-  try {
-    const result = await pool.query(query);
-    return result.rows[0];
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-}
 
 async function getUsers() {
   const query = {
@@ -61,14 +23,15 @@ async function getUsers() {
   }
 }
 
-async function getUserById(id) {
-  if (!id) {
-    throw new Error("ID is required");
+
+async function getUserByUsername(username) {
+  if (!username) {
+    throw new Error("Username is required");
   }
 
   const query = {
-    text: `SELECT * FROM users WHERE id = $1`,
-    values: [id],
+    text: `SELECT * FROM users WHERE username = $1`,
+    values: [username],
   };
   try {
     const result = await pool.query(query);
@@ -79,14 +42,36 @@ async function getUserById(id) {
   }
 }
 
-async function getUserByUsername(username) {
-  if (!username) {
-    throw new Error("Username is required");
+async function createUser(
+  username,
+  password,
+  role,
+  name,
+  email,
+  phone,
+  address,
+  profile_pic,
+  angkatan,
+  div
+) {
+  if (!username || !password || !role) {
+    throw new Error("Username, password, and role are required");
   }
 
   const query = {
-    text: `SELECT * FROM users WHERE username = $1`,
-    values: [username],
+    text: `INSERT INTO users (username, password, role, name, email, phone, address, profile_pic, angkatan, div) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+    values: [
+      username,
+      password,
+      role,
+      name || null,
+      email || null,
+      phone || null,
+      address || null,
+      profile_pic || null,
+      angkatan || null,
+      div || null,
+    ],
   };
   try {
     const result = await pool.query(query);
@@ -107,7 +92,8 @@ async function editUser(
   phone,
   address,
   profile_pic,
-  angkatan
+  angkatan,
+  div
 ) {
   if (
     !id ||
@@ -119,10 +105,11 @@ async function editUser(
       !phone &&
       !address &&
       !profile_pic &&
-      !angkatan)
+      !angkatan &&
+      !div)
   ) {
     throw new Error(
-      "ID is required and at least one of username, password, role, name, email, phone, address, profile_pic, or angkatan must be provided"
+      "ID is required and at least one of username, password, role, name, email, phone, address, profile_pic, angkatan, or div must be provided"
     );
   }
 
@@ -141,10 +128,11 @@ async function editUser(
     address: address || existingUser.address,
     profile_pic: profile_pic || existingUser.profile_pic,
     angkatan: angkatan || existingUser.angkatan,
+    div: div || existingUser.div,
   };
 
   const query = {
-    text: `UPDATE users SET username = $1, password = $2, role = $3, name = $4, email = $5, phone = $6, address = $7, profile_pic = $8, angkatan = $9, updated_at = CURRENT_TIMESTAMP WHERE id = $10 RETURNING *`,
+    text: `UPDATE users SET username = $1, password = $2, role = $3, name = $4, email = $5, phone = $6, address = $7, profile_pic = $8, angkatan = $9, div = $10, updated_at = CURRENT_TIMESTAMP WHERE id = $11 RETURNING *`,
     values: [
       updatedUser.username,
       updatedUser.password,
@@ -155,6 +143,7 @@ async function editUser(
       updatedUser.address,
       updatedUser.profile_pic,
       updatedUser.angkatan,
+      updatedUser.div,
       id,
     ],
   };
@@ -173,6 +162,24 @@ async function editUser(
       });
     }
 
+    return result.rows[0];
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+async function getUserById(id) {
+  if (!id) {
+    throw new Error("ID is required");
+  }
+
+  const query = {
+    text: `SELECT * FROM users WHERE id = $1`,
+    values: [id],
+  };
+  try {
+    const result = await pool.query(query);
     return result.rows[0];
   } catch (err) {
     console.error(err);
