@@ -18,7 +18,7 @@ const {
 } = require('../database/users.db');
 
 // route to get attendance log for every user
-router.get('/attendance-log', authenticate, authorizeRoles('admin'), async (req, res) => {
+router.get('/attendance-log', authenticate, authorizeRoles('admin','pengurus'), async (req, res) => {
   try {
     const attendanceLog = await getAttendanceLogForAllUsers();
     res.json(attendanceLog);
@@ -29,7 +29,7 @@ router.get('/attendance-log', authenticate, authorizeRoles('admin'), async (req,
 });
 
 // route to get attendance log for a specific user
-router.get('/:id/attendance-log', authenticate, authorizeRoles('admin'), async (req, res) => {
+router.get('/:id/attendance-log', authenticate, authorizeRoles('admin','pengurus'), async (req, res) => {
   try {
     const { id } = req.params;
     const attendanceLog = await getAttendanceLogForUser(id);
@@ -55,7 +55,7 @@ router.get('/me', authenticate, async (req, res) => {
 });
 
 // GET all users
-router.get('/', authenticate, authorizeRoles('admin'), async (req, res) => {
+router.get('/', authenticate, authorizeRoles('admin','pengurus'), async (req, res) => {
   try {
     const users = await getUsers();
     res.json(users);
@@ -66,7 +66,7 @@ router.get('/', authenticate, authorizeRoles('admin'), async (req, res) => {
 });
 
 // GET /users/:id
-router.get('/:id', authenticate, authorizeRoles('admin'), async (req, res) => {
+router.get('/:id', authenticate, authorizeRoles('admin','pengurus'), async (req, res) => {
   try {
     const { id } = req.params;
     const user = await getUserById(id);
