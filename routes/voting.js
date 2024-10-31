@@ -11,11 +11,14 @@ const {
     deleteVotingTopic,
     createVotingOption,
     getVotingOptionsByTopicId,
+    getVotingOptionById,
+    updateVotingOption,
     deleteVotingOption,
     submitVote,
     calculateVoteResults,
     getVoteResultsByTopicId,
-    getVoteResultWithUsers
+    getVoteResultWithUsers,
+    deleteVoteResult
 } = require('../database/voting.db');
 const authenticate = require('../middleware/authenticate');
 const { authorizeRoles } = require('../middleware/authorize');
@@ -60,7 +63,7 @@ router.put('/:id', authenticate, authorizeRoles('admin', 'pengurus'), upload.non
     try {
         const { id } = req.params;
         const { title, description } = req.body;
-        await updateVotingTopic(id, title, description);
+        const updatedTopic = await updateVotingTopic(id, title, description);
         res.json(updatedTopic);
     } catch (err) {
         console.error(err);
@@ -110,6 +113,33 @@ router.get('/:topicId/options', authenticate, authorizeRoles('admin', 'pengurus'
     }
 });
 
+// Get a single voting option by ID
+router.get('/:topicId/options/:id', authenticate, authorizeRoles('admin', 'pengurus', 'siswa'), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const option = await getVotingOptionById(id);
+        res.json(option);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: `Error retrieving voting option: ${err.message}` });
+    }
+});
+
+// Update a voting option
+router.put('/:topicId/options/:id', authenticate, authorizeRoles('admin', 'pengurus'), upload.none(), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { option, img } = req.body;
+        const updatedOption = await updateVotingOption(id, option, img);
+        res.json(updatedOption);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: `Error updating voting option: ${err.message}` });
+    }
+});
+
+
+
 // Delete a voting option
 router.delete('/:topicId/options/:id', authenticate, authorizeRoles('admin', 'pengurus'), async (req, res) => {
     try {
@@ -153,7 +183,7 @@ router.get('/:topicId/results', authenticate, authorizeRoles('admin', 'pengurus'
 });
 
 // Get a single vote result along with users who voted for it
-router.get('/:topicId/options/:optionId', authenticate, authorizeRoles('admin', 'pengurus'), async (req, res) => {
+router.get('/:topicId/results/:optionId', authenticate, authorizeRoles('admin', 'pengurus'), async (req, res) => {
     try {
         const { topicId, optionId } = req.params;
         const result = await getVoteResultWithUsers(topicId, optionId);
@@ -163,5 +193,18 @@ router.get('/:topicId/options/:optionId', authenticate, authorizeRoles('admin', 
         res.status(500).send({ message: `Error retrieving vote result: ${err.message}` });
     }
 });
+
+// Delete a vote result
+router.delete('/:topicId/results/', authenticate, authorizeRoles('admin', 'pengurus'), async (req, res) => {
+    try {
+        const { topicId } = req.params;
+        const message = await deleteVoteResult(topicId);
+        res.json({ message });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: `Error deleting vote result: ${err.message}` });
+    }
+});
+
 
 module.exports = router;

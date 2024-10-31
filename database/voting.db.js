@@ -115,6 +115,59 @@ async function getVotingOptionsByTopicId(voting_topic_id) {
     }
 }
 
+async function getVotingOptionById(id) {
+    const query = {
+      text: `SELECT * FROM voting_options WHERE id = $1`,
+      values: [id],
+    };
+    try {
+      const result = await pool.query(query);
+      return result.rows[0];
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
+async function updateVotingOption(id, option, img) {
+    const checkQuery = {
+      text: `SELECT * FROM voting_options WHERE id = $1`,
+      values: [id],
+    };
+  
+    try {
+      const checkResult = await pool.query(checkQuery);
+      if (checkResult.rows.length === 0) {
+        throw new Error('Voting option not found.');
+      }
+  
+      const existingOption = checkResult.rows[0];
+      const query = {
+        text: `UPDATE voting_options SET option = $1, img = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING *`,
+        values: [option, img, id],
+      };
+  
+      const result = await pool.query(query);
+  
+      // Delete the old image if a new one is provided
+      if (img && existingOption.img && img !== existingOption.img) {
+        const oldImgPath = path.join(__dirname, '..', existingOption.img);
+        fs.unlink(oldImgPath, (err) => {
+          if (err) {
+            console.error(`Error deleting old image: ${err.message}`);
+          } else {
+            console.log(`Old image deleted: ${oldImgPath}`);
+          }
+        });
+      }
+  
+      return result.rows[0];
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
 async function deleteVotingOption(id) {
     const query = {
         text: `DELETE FROM voting_options WHERE id = $1`,
@@ -217,6 +270,20 @@ async function getVoteResultWithUsers(voting_topic_id, option_id) {
     }
 }
 
+async function deleteVoteResult(voting_topic_id, option_id) {
+    const query = {
+        text: `DELETE FROM vote_results WHERE voting_topic_id = $1`,
+        values: [voting_topic_id],
+      };
+      try {
+        await pool.query(query);
+        return "All vote results for the topic have been deleted.";
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
+  }
+
 module.exports = {
     createVotingTopic,
     getVotingTopics,
@@ -225,9 +292,12 @@ module.exports = {
     deleteVotingTopic,
     createVotingOption,
     getVotingOptionsByTopicId,
+    getVotingOptionById,
+    updateVotingOption,
     deleteVotingOption,
     submitVote,
     calculateVoteResults,
     getVoteResultsByTopicId,
-    getVoteResultWithUsers
+    getVoteResultWithUsers,
+    deleteVoteResult
 };
