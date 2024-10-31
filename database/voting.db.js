@@ -1,4 +1,6 @@
 const { Pool } = require("pg");
+const fs = require('fs');
+const path = require('path');
 
 const pool = new Pool({
     user: process.env.DB_USER,
@@ -172,12 +174,38 @@ async function updateVotingOption(id, option, img) {
 }
 
 async function deleteVotingOption(id) {
-    const query = {
+    const checkQuery = {
+        text: `SELECT * FROM voting_options WHERE id = $1`,
+        values: [id],
+    };
+
+    const deleteQuery = {
         text: `DELETE FROM voting_options WHERE id = $1`,
         values: [id],
     };
+
     try {
-        await pool.query(query);
+        const checkResult = await pool.query(checkQuery);
+        if (checkResult.rows.length === 0) {
+            throw new Error('Voting option not found.');
+        }
+
+        const existingOption = checkResult.rows[0];
+
+        await pool.query(deleteQuery);
+
+        // Delete the image if it exists
+        if (existingOption.img) {
+            const imgPath = path.join(__dirname, '..', existingOption.img);
+            fs.unlink(imgPath, (err) => {
+                if (err) {
+                    console.error(`Error deleting image: ${err.message}`);
+                } else {
+                    console.log(`Image deleted: ${imgPath}`);
+                }
+            });
+        }
+
         return "Voting option deleted.";
     } catch (err) {
         console.error(err);
