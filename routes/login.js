@@ -20,7 +20,7 @@ router.post('/', upload.none(), async (req, res) => {
       return res.status(400).send({ error: 'Invalid username or password' });
     }
 
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.json({ token });
   } catch (err) {
     console.error(err);
