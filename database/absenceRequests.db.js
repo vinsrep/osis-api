@@ -48,15 +48,18 @@ async function createAbsenceRequest(user_id, meeting_schedule_id, reason) {
     throw err;
   }
 }
-
-async function updateAbsenceRequest(id, reason) {
+async function updateAbsenceRequest(id, reason, state) {
   const query = {
-    text: `UPDATE absence_requests SET reason = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *`,
-    values: [reason, id],
+    text: `UPDATE absence_requests SET reason = $1, state = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING *`,
+    values: [reason, state, id],
   };
   try {
     const result = await pool.query(query);
-    return result.rows[0];
+    const updatedRequest = result.rows[0];
+    if (updatedRequest) {
+      return await processAbsenceRequest(id, state);
+    }
+    return null;
   } catch (err) {
     console.error(err);
     throw err;

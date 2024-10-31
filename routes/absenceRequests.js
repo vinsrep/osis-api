@@ -64,8 +64,8 @@ router.post("/", authenticate, authorizeRoles('admin', 'pengurus'), upload, asyn
 router.put("/:id", authenticate, authorizeRoles('admin', 'pengurus'), upload, async (req, res) => {
     try {
         const { id } = req.params;
-        const { reason } = req.body;
-        const updatedRequest = await updateAbsenceRequest(id, reason);
+        const { reason, state } = req.body;
+        const updatedRequest = await updateAbsenceRequest(id, reason, state);
         res.json(updatedRequest);
     } catch (err) {
         console.error(err);
