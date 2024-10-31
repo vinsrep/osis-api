@@ -131,42 +131,45 @@ async function getVotingOptionById(id) {
 
 async function updateVotingOption(id, option, img) {
     const checkQuery = {
-      text: `SELECT * FROM voting_options WHERE id = $1`,
-      values: [id],
+        text: `SELECT * FROM voting_options WHERE id = $1`,
+        values: [id],
     };
-  
+
     try {
-      const checkResult = await pool.query(checkQuery);
-      if (checkResult.rows.length === 0) {
-        throw new Error('Voting option not found.');
-      }
-  
-      const existingOption = checkResult.rows[0];
-      const query = {
-        text: `UPDATE voting_options SET option = $1, img = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING *`,
-        values: [option, img, id],
-      };
-  
-      const result = await pool.query(query);
-  
-      // Delete the old image if a new one is provided
-      if (img && existingOption.img && img !== existingOption.img) {
-        const oldImgPath = path.join(__dirname, '..', existingOption.img);
-        fs.unlink(oldImgPath, (err) => {
-          if (err) {
-            console.error(`Error deleting old image: ${err.message}`);
-          } else {
-            console.log(`Old image deleted: ${oldImgPath}`);
-          }
-        });
-      }
-  
-      return result.rows[0];
+        const checkResult = await pool.query(checkQuery);
+        if (checkResult.rows.length === 0) {
+            throw new Error('Voting option not found.');
+        }
+
+        const existingOption = checkResult.rows[0];
+        const updatedOption = option !== undefined ? option : existingOption.option;
+        const updatedImg = img !== undefined ? img : existingOption.img;
+
+        const query = {
+            text: `UPDATE voting_options SET option = $1, img = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING *`,
+            values: [updatedOption, updatedImg, id],
+        };
+
+        const result = await pool.query(query);
+
+        // Delete the old image if a new one is provided
+        if (img && existingOption.img && img !== existingOption.img) {
+            const oldImgPath = path.join(__dirname, '..', existingOption.img);
+            fs.unlink(oldImgPath, (err) => {
+                if (err) {
+                    console.error(`Error deleting old image: ${err.message}`);
+                } else {
+                    console.log(`Old image deleted: ${oldImgPath}`);
+                }
+            });
+        }
+
+        return result.rows[0];
     } catch (err) {
-      console.error(err);
-      throw err;
+        console.error(err);
+        throw err;
     }
-  }
+}
 
 async function deleteVotingOption(id) {
     const query = {

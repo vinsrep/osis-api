@@ -126,10 +126,11 @@ router.get('/:topicId/options/:id', authenticate, authorizeRoles('admin', 'pengu
 });
 
 // Update a voting option
-router.put('/:topicId/options/:id', authenticate, authorizeRoles('admin', 'pengurus'), upload.none(), async (req, res) => {
+router.put('/:topicId/options/:id', authenticate, authorizeRoles('admin', 'pengurus'), img.single('img'), async (req, res) => {
     try {
         const { id } = req.params;
-        const { option, img } = req.body;
+        const { option } = req.body;
+        const img = req.file ? `/uploads/images/${req.file.filename}` : null;
         const updatedOption = await updateVotingOption(id, option, img);
         res.json(updatedOption);
     } catch (err) {
