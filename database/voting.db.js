@@ -214,12 +214,23 @@ async function deleteVotingOption(id) {
 }
 
 async function submitVote(user_id, voting_topic_id, option_id) {
-    const query = {
+    const checkQuery = {
+        text: `SELECT * FROM votes WHERE user_id = $1 AND voting_topic_id = $2`,
+        values: [user_id, voting_topic_id],
+    };
+
+    const insertQuery = {
         text: `INSERT INTO votes (user_id, voting_topic_id, option_id) VALUES ($1, $2, $3) RETURNING *`,
         values: [user_id, voting_topic_id, option_id],
     };
+
     try {
-        const result = await pool.query(query);
+        const checkResult = await pool.query(checkQuery);
+        if (checkResult.rows.length > 0) {
+            throw new Error('User has already voted for this topic.');
+        }
+
+        const result = await pool.query(insertQuery);
         return result.rows[0];
     } catch (err) {
         console.error(err);
