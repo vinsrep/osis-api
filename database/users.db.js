@@ -12,7 +12,7 @@ const pool = new Pool({
 
 async function getUsers() {
   const query = {
-    text: `SELECT * FROM users`,
+    text: `SELECT * FROM users WHERE deleted_at IS NULL`,
   };
   try {
     const result = await pool.query(query);
@@ -30,7 +30,7 @@ async function getUserByUsername(username) {
   }
 
   const query = {
-    text: `SELECT * FROM users WHERE username = $1`,
+    text: `SELECT * FROM users WHERE username = $1 AND deleted_at IS NULL`,
     values: [username],
   };
   try {
@@ -175,7 +175,7 @@ async function getUserById(id) {
   }
 
   const query = {
-    text: `SELECT * FROM users WHERE id = $1`,
+    text: `SELECT * FROM users WHERE id = $1 AND deleted_at IS NULL`,
     values: [id],
   };
   try {
@@ -200,12 +200,16 @@ async function deleteUser(id) {
 
   const profilePicPath = user.profile_pic;
 
-  const query = {
-    text: `DELETE FROM users WHERE id = $1`,
-    values: [id],
-  };
+  const client = await pool.connect();
   try {
-    await pool.query(query);
+    await client.query('BEGIN');
+
+    // Soft delete the user by setting the deleted_at column
+    const deleteUserQuery = {
+      text: `UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1`,
+      values: [id],
+    };
+    await client.query(deleteUserQuery);
 
     // Delete the profile picture if it exists
     if (profilePicPath) {
@@ -219,10 +223,14 @@ async function deleteUser(id) {
       });
     }
 
-    return "User has been deleted.";
+    await client.query('COMMIT');
+    return "User has been soft deleted.";
   } catch (err) {
+    await client.query('ROLLBACK');
     console.error(err);
     throw err;
+  } finally {
+    client.release();
   }
 }
 
